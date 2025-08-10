@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Handling Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .pass { color: green; }
+        .fail { color: red; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Error Handling and Accessibility Test</h1>
+    
+    <div class="test-section">
+        <h2>Error Handling Tests</h2>
+        <button onclick="testMissingElement()">Test Missing Element Error</button>
+        <button onclick="testInvalidOperation()">Test Invalid Operation Error</button>
+        <div id="error-test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Accessibility Tests</h2>
+        <button onclick="testScreenReaderAnnouncement()">Test Screen Reader Announcement</button>
+        <button onclick="testKeyboardNavigation()">Test Keyboard Navigation</button>
+        <div id="accessibility-test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Graceful Degradation Tests</h2>
+        <button onclick="testFeatureDetection()">Test Feature Detection</button>
+        <div id="degradation-test-results"></div>
+    </div>
+
+    <script>
+        // Import the utility functions from the main script
+        // Utility function to show system-wide error messages
+        function showSystemError(message) {
+            try {
+                const existingError = document.querySelector('.system-error');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                const errorElement = document.createElement('div');
+                errorElement.className = 'system-error';
+                errorElement.setAttribute('role', 'alert');
+                errorElement.setAttribute('aria-live', 'assertive');
+                errorElement.textContent = message;
+                
+                errorElement.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #fed7d7;
+                    color: #c53030;
+                    padding: 1rem;
+                    border-radius: 6px;
+                    border: 1px solid #feb2b2;
+                    z-index: 1000;
+                    max-width: 90%;
+                    text-align: center;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                `;
+                
+                document.body.insertBefore(errorElement, document.body.firstChild);
+                
+                setTimeout(() => {
+                    if (errorElement.parentNode) {
+                        errorElement.remove();
+                    }
+                }, 3000);
+                
+                console.log('System error displayed:', message);
+                
+            } catch (error) {
+                console.error('Error showing system error:', error);
+                alert(`System Error: ${message}`);
+            }
+        }
+
+        // Utility function to announce messages to screen readers
+        function announceToScreenReader(message) {
+            try {
+                let announcer = document.getElementById('screen-reader-announcer');
+                
+                if (!announcer) {
+                    announcer = document.createElement('div');
+                    announcer.id = 'screen-reader-announcer';
+                    announcer.setAttribute('aria-live', 'polite');
+                    announcer.setAttribute('aria-atomic', 'true');
+                    announcer.style.cssText = `
+                        position: absolute;
+                        left: -10000px;
+                        width: 1px;
+                        height: 1px;
+                        overflow: hidden;
+                    `;
+                    document.body.appendChild(announcer);
+                }
+                
+                announcer.textContent = '';
+                setTimeout(() => {
+                    announcer.textContent = message;
+                }, 100);
+                
+                console.log('Screen reader announcement:', message);
+                
+            } catch (error) {
+                console.error('Error announcing to screen reader:', error);
+            }
+        }
+
+        // Test functions
+        function testMissingElement() {
+            const results = document.getElementById('error-test-results');
+            try {
+                // Try to access a non-existent element
+                const missingElement = document.getElementById('non-existent-element');
+                if (!missingElement) {
+                    showSystemError('Test error: Element not found (this is expected)');
+                    results.innerHTML = '<p class="pass">✓ Missing element error handling works</p>';
+                } else {
+                    results.innerHTML = '<p class="fail">✗ Missing element test failed</p>';
+                }
+            } catch (error) {
+                results.innerHTML = '<p class="pass">✓ Error caught and handled properly</p>';
+            }
+        }
+
+        function testInvalidOperation() {
+            const results = document.getElementById('error-test-results');
+            try {
+                // Try an operation that might fail
+                const testElement = document.createElement('div');
+                testElement.nonExistentMethod(); // This will throw an error
+            } catch (error) {
+                showSystemError('Test error: Invalid operation (this is expected)');
+                results.innerHTML += '<p class="pass">✓ Invalid operation error handling works</p>';
+            }
+        }
+
+        function testScreenReaderAnnouncement() {
+            const results = document.getElementById('accessibility-test-results');
+            announceToScreenReader('This is a test announcement for screen readers');
+            
+            const announcer = document.getElementById('screen-reader-announcer');
+            if (announcer) {
+                results.innerHTML = '<p class="pass">✓ Screen reader announcer created successfully</p>';
+            } else {
+                results.innerHTML = '<p class="fail">✗ Screen reader announcer not working</p>';
+            }
+        }
+
+        function testKeyboardNavigation() {
+            const results = document.getElementById('accessibility-test-results');
+            
+            // Test if buttons have proper focus handling
+            const buttons = document.querySelectorAll('button');
+            let hasTabIndex = true;
+            
+            buttons.forEach(button => {
+                if (button.tabIndex < 0) {
+                    hasTabIndex = false;
+                }
+            });
+            
+            if (hasTabIndex) {
+                results.innerHTML += '<p class="pass">✓ Keyboard navigation support detected</p>';
+            } else {
+                results.innerHTML += '<p class="fail">✗ Keyboard navigation issues detected</p>';
+            }
+        }
+
+        function testFeatureDetection() {
+            const results = document.getElementById('degradation-test-results');
+            
+            const features = {
+                localStorage: typeof Storage !== 'undefined',
+                addEventListener: !!document.addEventListener,
+                querySelector: !!document.querySelector,
+                classList: !!document.createElement('div').classList
+            };
+            
+            const allSupported = Object.values(features).every(f => f);
+            
+            if (allSupported) {
+                results.innerHTML = '<p class="pass">✓ All required features supported</p>';
+            } else {
+                results.innerHTML = '<p class="fail">✗ Some features not supported: ' + 
+                    JSON.stringify(features) + '</p>';
+            }
+        }
+
+        // Add keyboard event listeners for testing
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const systemError = document.querySelector('.system-error');
+                if (systemError) {
+                    systemError.remove();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

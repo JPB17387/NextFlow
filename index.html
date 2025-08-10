@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Task Dashboard MVP - A simple task management application">
+    <title>Task Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header role="banner">
+        <h1>Task Dashboard</h1>
+        <div class="time-display" role="region" aria-label="Current time and date">
+            <div id="clock" aria-live="polite" aria-label="Current time"></div>
+            <div id="date" aria-live="polite" aria-label="Current date"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main role="main">
+        <!-- Task Form Section -->
+        <section class="task-form-section" role="region" aria-labelledby="add-task-heading">
+            <h2 id="add-task-heading">Add New Task</h2>
+            <form id="taskForm" role="form" aria-label="Add new task form">
+                <div class="form-group">
+                    <label for="taskName">Task Name: <span aria-label="required">*</span></label>
+                    <input type="text" id="taskName" name="taskName" placeholder="Enter task name" required 
+                           aria-describedby="taskName-help" maxlength="100">
+                    <div id="taskName-help" class="sr-only">Enter a descriptive name for your task (required, maximum 100 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskCategory">Category: <span aria-label="required">*</span></label>
+                    <select id="taskCategory" name="taskCategory" required aria-describedby="taskCategory-help">
+                        <option value="">Select category</option>
+                        <option value="Work">Work</option>
+                        <option value="Study">Study</option>
+                        <option value="Personal">Personal</option>
+                    </select>
+                    <div id="taskCategory-help" class="sr-only">Choose a category to organize your task (required)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskTime">Scheduled Time:</label>
+                    <input type="time" id="taskTime" name="taskTime" aria-describedby="taskTime-help">
+                    <div id="taskTime-help" class="sr-only">Optional: Set a specific time for this task</div>
+                </div>
+                
+                <button type="button" id="addTaskBtn" aria-describedby="addTask-help">Add Task</button>
+                <div id="addTask-help" class="sr-only">Keyboard shortcut: Ctrl+Enter from anywhere, or press Enter in the task name field</div>
+            </form>
+        </section>
+
+        <!-- Task List Section -->
+        <section class="task-list-section" role="region" aria-labelledby="task-list-heading">
+            <h2 id="task-list-heading">Your Tasks</h2>
+            <div id="taskList" role="list" aria-label="Task list">
+                <!-- Tasks will be dynamically added here -->
+            </div>
+        </section>
+
+        <!-- Progress Bar Section -->
+        <section class="progress-section" role="region" aria-labelledby="progress-heading">
+            <h2 id="progress-heading">Progress</h2>
+            <div id="progressContainer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" 
+                 aria-label="Task completion progress">
+                <div id="progressBar"></div>
+                <span id="progressLabel" aria-live="polite">0%</span>
+            </div>
+        </section>
+
+        <!-- Suggestions Section -->
+        <section class="suggestions-section" role="region" aria-labelledby="suggestions-heading">
+            <h2 id="suggestions-heading">Productivity Tips</h2>
+            <button id="suggestionBtn" aria-describedby="suggestion-help">Ask Kiro for a Suggestion</button>
+            <div id="suggestion-help" class="sr-only">Keyboard shortcut: Alt+S</div>
+            <textarea id="suggestionText" readonly placeholder="Click the button above for helpful productivity tips!" 
+                      aria-label="Productivity suggestion display area"></textarea>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer role="contentinfo">
+        <p>© 2025 Jhon Paul Baonil • Associated with CodeSprout Hack.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

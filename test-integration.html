@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Dashboard Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task Dashboard MVP - Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Application Preview</h2>
+        <iframe src="index.html" title="Task Dashboard MVP"></iframe>
+    </div>
+    
+    <div class="test-section">
+        <h2>Manual Test Instructions</h2>
+        <ol>
+            <li><strong>Clock Test:</strong> Verify the clock updates every second and shows current date</li>
+            <li><strong>Add Task Test:</strong> 
+                <ul>
+                    <li>Try adding a task with all fields filled</li>
+                    <li>Try adding a task with empty name (should show error)</li>
+                    <li>Try adding a task with no category (should show error)</li>
+                </ul>
+            </li>
+            <li><strong>Task Management Test:</strong>
+                <ul>
+                    <li>Add a task, then mark it as complete</li>
+                    <li>Verify the progress bar updates</li>
+                    <li>Delete the task and verify progress updates again</li>
+                </ul>
+            </li>
+            <li><strong>Suggestion Test:</strong> Click "Ask Kiro for a Suggestion" multiple times and verify different suggestions appear</li>
+            <li><strong>Responsive Test:</strong> Resize the browser window to test mobile/desktop layouts</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>Automated Test Controls</h2>
+        <p>Open the browser console and use these commands:</p>
+        <ul>
+            <li><code>testDashboard.runAllTests()</code> - Run all automated tests</li>
+            <li><code>testDashboard.addSampleData()</code> - Add sample tasks for testing</li>
+            <li><code>testDashboard.clearAllTasks()</code> - Clear all tasks</li>
+            <li><code>testDashboard.showStats()</code> - Show current application statistics</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>Requirements Verification Checklist</h2>
+        <h3>Requirement 7.1 - Browser Environment</h3>
+        <ul>
+            <li>✅ Application runs entirely in browser</li>
+            <li>✅ No external API calls required</li>
+            <li>✅ All functionality works offline</li>
+        </ul>
+        
+        <h3>Requirement 7.2 - No External Dependencies</h3>
+        <ul>
+            <li>✅ No internet connectivity required</li>
+            <li>✅ All resources are local</li>
+        </ul>
+        
+        <h3>Requirement 7.3 - Data Reset on Refresh</h3>
+        <ul>
+            <li>✅ Page refresh resets all data</li>
+            <li>✅ Data stored only in memory</li>
+        </ul>
+        
+        <h3>Requirement 7.4 - No Authentication</h3>
+        <ul>
+            <li>✅ No user accounts required</li>
+            <li>✅ Immediate access to all features</li>
+        </ul>
+        
+        <h3>Requirement 7.5 - Memory-Only Storage</h3>
+        <ul>
+            <li>✅ All data stored in JavaScript arrays/objects</li>
+            <li>✅ No persistent storage used</li>
+        </ul>
+    </div>
+</body>
+</html>
