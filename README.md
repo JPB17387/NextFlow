@@ -52,6 +52,7 @@ python -m http.server 8000
 Write-Host "Starting local server for Task Dashboard MVP..." -ForegroundColor Green; Write-Host "Server will be available at: http://localhost:3000" -ForegroundColor Yellow; Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Cyan; npx serve . -p 3000
 
 #Live Server
+
 ```
   Open VSCODE or any IDE then right click the index.html
 
