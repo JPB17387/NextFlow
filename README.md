@@ -18,11 +18,23 @@ A simple, accessible, and responsive task management application built with vani
 
 ### Desktop View
 
-The application features a clean, modern interface with a two-column layout on desktop devices.
+The application features a clean, modern interface with a two-column layout on desktop devices. 
+
+![screenshot - Desktop View](screenshots/desktop%20view%201.png)
+
+![screenshot - Desktop View](screenshots/desktop%20view%202.png)
+
+![screenshot - Desktop View](screenshots/desktop%20view%203.png)
 
 ### Mobile View
 
 On mobile devices, the interface adapts to a single-column layout with touch-friendly controls.
+
+![screenshot - Desktop View](screenshots/mobile%20view%201.png)
+
+![screenshot - Desktop View](screenshots/mobile%20view%202.png)
+
+![screenshot - Desktop View](screenshots/mobile%20view%203.png)
 
 ## 🛠️ Installation
 
