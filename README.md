@@ -1,6 +1,6 @@
 # Task Dashboard MVP
 
-A simple, accessible, and responsive task management application built with vanilla HTML, CSS, and JavaScript.
+A simple, accessible, and responsive task management application built with vanilla HTML, CSS, and JavaScript. 
 
 ## 🚀 Features
 

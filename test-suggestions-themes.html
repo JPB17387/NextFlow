@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggestions Theme Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { margin: 0; background: #f0f0f0; }
+        .theme-test-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .theme-preview {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .theme-label {
+            background: #333;
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .suggestions-container {
+            padding: 1rem;
+        }
+        .demo-section {
+            margin-bottom: 2rem;
+        }
+        .demo-section h3 {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-test-container">
+        <!-- White Theme -->
+        <div class="theme-preview" data-theme="white">
+            <div class="theme-label">White Theme</div>
+            <div class="suggestions-container">
+                <section class="suggestions-section">
+                    <h2>Productivity Tips</h2>
+                    
+                    <div class="demo-section">
+                        <h3>Normal State</h3>
+                        <button id="suggestionBtn1">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText1" readonly placeholder="Click the button above for helpful productivity tips!"></textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>With Suggestion</h3>
+                        <button id="suggestionBtn2">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText2" readonly>Break large tasks into smaller, manageable chunks to improve focus and reduce overwhelm.</textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>Updated State</h3>
+                        <button id="suggestionBtn3">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText3" class="suggestion-updated" readonly>Use the Pomodoro Technique: 25 minutes focused work, 5 minute break.</textarea>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Dark Theme -->
+        <div class="theme-preview" data-theme="dark">
+            <div class="theme-label">Dark Theme</div>
+            <div class="suggestions-container">
+                <section class="suggestions-section">
+                    <h2>Productivity Tips</h2>
+                    
+                    <div class="demo-section">
+                        <h3>Normal State</h3>
+                        <button id="suggestionBtn4">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText4" readonly placeholder="Click the button above for helpful productivity tips!"></textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>With Suggestion</h3>
+                        <button id="suggestionBtn5">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText5" readonly>Break large tasks into smaller, manageable chunks to improve focus and reduce overwhelm.</textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>Updated State</h3>
+                        <button id="suggestionBtn6">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText6" class="suggestion-updated" readonly>Use the Pomodoro Technique: 25 minutes focused work, 5 minute break.</textarea>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Student Theme -->
+        <div class="theme-preview" data-theme="student">
+            <div class="theme-label">Student Theme</div>
+            <div class="suggestions-container">
+                <section class="suggestions-section">
+                    <h2>Productivity Tips</h2>
+                    
+                    <div class="demo-section">
+                        <h3>Normal State</h3>
+                        <button id="suggestionBtn7">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText7" readonly placeholder="Click the button above for helpful productivity tips!"></textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>With Suggestion</h3>
+                        <button id="suggestionBtn8">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText8" readonly>Break large tasks into smaller, manageable chunks to improve focus and reduce overwhelm.</textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>Updated State</h3>
+                        <button id="suggestionBtn9">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText9" class="suggestion-updated" readonly>Use the Pomodoro Technique: 25 minutes focused work, 5 minute break.</textarea>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Developer Theme -->
+        <div class="theme-preview" data-theme="developer">
+            <div class="theme-label">Developer Theme</div>
+            <div class="suggestions-container">
+                <section class="suggestions-section">
+                    <h2>Productivity Tips</h2>
+                    
+                    <div class="demo-section">
+                        <h3>Normal State</h3>
+                        <button id="suggestionBtn10">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText10" readonly placeholder="Click the button above for helpful productivity tips!"></textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>With Suggestion</h3>
+                        <button id="suggestionBtn11">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText11" readonly>Break large tasks into smaller, manageable chunks to improve focus and reduce overwhelm.</textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>Updated State</h3>
+                        <button id="suggestionBtn12">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText12" class="suggestion-updated" readonly>Use the Pomodoro Technique: 25 minutes focused work, 5 minute break.</textarea>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Professional Theme -->
+        <div class="theme-preview" data-theme="professional">
+            <div class="theme-label">Professional Theme</div>
+            <div class="suggestions-container">
+                <section class="suggestions-section">
+                    <h2>Productivity Tips</h2>
+                    
+                    <div class="demo-section">
+                        <h3>Normal State</h3>
+                        <button id="suggestionBtn13">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText13" readonly placeholder="Click the button above for helpful productivity tips!"></textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>With Suggestion</h3>
+                        <button id="suggestionBtn14">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText14" readonly>Break large tasks into smaller, manageable chunks to improve focus and reduce overwhelm.</textarea>
+                    </div>
+                    
+                    <div class="demo-section">
+                        <h3>Updated State</h3>
+                        <button id="suggestionBtn15">Ask Kiro for a Suggestion</button>
+                        <textarea id="suggestionText15" class="suggestion-updated" readonly>Use the Pomodoro Technique: 25 minutes focused work, 5 minute break.</textarea>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

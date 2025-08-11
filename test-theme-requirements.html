@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Manager Requirements Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: var(--theme-primary-bg);
+            color: var(--theme-text-primary);
+            border: 1px solid var(--theme-border-light);
+            border-radius: 8px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--theme-secondary-bg);
+            border-radius: 6px;
+        }
+        .test-button {
+            margin: 5px;
+            padding: 10px 20px;
+            background: var(--theme-accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background: var(--theme-accent-hover);
+        }
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .test-output {
+            font-family: 'Courier New', monospace;
+            background: var(--theme-secondary-bg);
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--theme-border-light);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .status-success {
+            color: var(--theme-success);
+            font-weight: bold;
+        }
+        .status-error {
+            color: var(--theme-error);
+            font-weight: bold;
+        }
+        .status-warning {
+            color: var(--theme-warning);
+            font-weight: bold;
+        }
+        .theme-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .theme-card {
+            padding: 15px;
+            border: 1px solid var(--theme-border-light);
+            border-radius: 6px;
+            background: var(--theme-secondary-bg);
+            text-align: center;
+        }
+        .theme-preview {
+            width: 100%;
+            height: 40px;
+            border-radius: 4px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Theme Manager Requirements Test Suite</h1>
+        <p>This page tests all requirements for Task 3: Build theme management JavaScript module</p>
+        
+        <div class="test-section">
+            <h2>Test Controls</h2>
+            <button class="test-button" id="runAllTests">Run All Requirements Tests</button>
+            <button class="test-button" id="clearOutput">Clear Output</button>
+            <button class="test-button" id="resetTheme">Reset Theme System</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>Theme Demo</h2>
+            <p>Test theme switching manually:</p>
+            <div class="theme-demo">
+                <div class="theme-card">
+                    <h3>White Theme</h3>
+                    <div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #f7fafc); color: #1a202c;">Light</div>
+                    <button class="test-button" onclick="testTheme('white')">Apply</button>
+                </div>
+                <div class="theme-card">
+                    <h3>Dark Theme</h3>
+                    <div class="theme-preview" style="background: linear-gradient(135deg, #1a202c, #2d3748);">Dark</div>
+                    <button class="test-button" onclick="testTheme('dark')">Apply</button>
+                </div>
+                <div class="theme-card">
+                    <h3>Student Theme</h3>
+                    <div class="theme-preview" style="background: linear-gradient(135deg, #f0fff4, #e6fffa); color: #1a365d;">Student</div>
+                    <button class="test-button" onclick="testTheme('student')">Apply</button>
+                </div>
+                <div class="theme-card">
+                    <h3>Developer Theme</h3>
+                    <div class="theme-preview" style="background: linear-gradient(135deg, #0d1117, #161b22);">Developer</div>
+                    <button class="test-button" onclick="testTheme('developer')">Apply</button>
+                </div>
+                <div class="theme-card">
+                    <h3>Professional Theme</h3>
+                    <div class="theme-preview" style="background: linear-gradient(135deg, #fafafa, #f5f5f5); color: #212121;">Professional</div>
+                    <button class="test-button" onclick="testTheme('professional')">Apply</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Output</h2>
+            <div id="testOutput" class="test-output">Click "Run All Requirements Tests" to start testing...</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Current Status</h2>
+            <div id="statusOutput" class="test-output">Loading...</div>
+        </div>
+    </div>
+
+    <script src="theme-manager.js"></script>
+    <script src="test-theme-requirements.js"></script>
+    <script>
+        let testRunner = null;
+        let originalConsoleLog = console.log;
+        
+        // Override console.log to capture output
+        function captureConsoleOutput() {
+            const output = document.getElementById('testOutput');
+            console.log = function(...args) {
+                const message = args.join(' ');
+                output.textContent += message + '\n';
+                output.scrollTop = output.scrollHeight;
+                originalConsoleLog.apply(console, args);
+            };
+        }
+        
+        function restoreConsoleOutput() {
+            console.log = originalConsoleLog;
+        }
+        
+        function testTheme(themeName) {
+            if (typeof themeManager !== 'undefined') {
+                const success = themeManager.setTheme(themeName);
+                updateStatus();
+                console.log(`Theme ${themeName} applied: ${success}`);
+            }
+        }
+        
+        function updateStatus() {
+            if (typeof themeManager !== 'undefined') {
+                const status = themeManager.getStatus();
+                const statusOutput = document.getElementById('statusOutput');
+                statusOutput.textContent = JSON.stringify(status, null, 2);
+            }
+        }
+        
+        async function runAllTests() {
+            const button = document.getElementById('runAllTests');
+            button.disabled = true;
+            button.textContent = 'Running Tests...';
+            
+            const output = document.getElementById('testOutput');
+            output.textContent = '';
+            
+            captureConsoleOutput();
+            
+            try {
+                testRunner = new ThemeRequirementsTest();
+                const success = await testRunner.runAllTests();
+                
+                if (success) {
+                    output.innerHTML += '\n<span class="status-success">🎉 ALL TESTS PASSED!</span>\n';
+                } else {
+                    output.innerHTML += '\n<span class="status-error">❌ SOME TESTS FAILED</span>\n';
+                }
+                
+            } catch (error) {
+                output.innerHTML += `\n<span class="status-error">Test runner error: ${error.message}</span>\n`;
+            } finally {
+                restoreConsoleOutput();
+                button.disabled = false;
+                button.textContent = 'Run All Requirements Tests';
+                updateStatus();
+            }
+        }
+        
+        function clearOutput() {
+            document.getElementById('testOutput').textContent = '';
+        }
+        
+        function resetTheme() {
+            if (typeof themeManager !== 'undefined') {
+                const success = themeManager.reset();
+                updateStatus();
+                console.log(`Theme system reset: ${success}`);
+            }
+        }
+        
+        // Initialize
+        function init() {
+            // Initialize theme manager
+            if (typeof themeManager !== 'undefined') {
+                themeManager.initializeThemeSystem();
+                updateStatus();
+                
+                // Listen for theme changes
+                document.addEventListener('themeChanged', function(event) {
+                    console.log('Theme changed:', event.detail);
+                    updateStatus();
+                });
+            }
+            
+            // Set up event listeners
+            document.getElementById('runAllTests').addEventListener('click', runAllTests);
+            document.getElementById('clearOutput').addEventListener('click', clearOutput);
+            document.getElementById('resetTheme').addEventListener('click', resetTheme);
+        }
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

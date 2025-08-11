@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage Error Handling Test - Task Dashboard MVP</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.25rem;
+        }
+        
+        .test-button:hover {
+            background: #0056b3;
+        }
+        
+        .test-results {
+            background: #e9ecef;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Storage Error Handling Test</h1>
+            <div class="clock-section">
+                <div id="clock">Loading...</div>
+                <div id="date">Loading...</div>
+            </div>
+        </header>
+
+        <div class="test-section">
+            <h2>Storage Availability Tests</h2>
+            <button class="test-button" onclick="testStorageAvailability()">Test Storage Availability</button>
+            <button class="test-button" onclick="testStorageInfo()">Get Storage Info</button>
+            <button class="test-button" onclick="testStorageRecovery()">Test Storage Recovery</button>
+            <div id="availability-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Data Validation Tests</h2>
+            <button class="test-button" onclick="testCorruptedData()">Test Corrupted Data</button>
+            <button class="test-button" onclick="testInvalidTaskData()">Test Invalid Task Data</button>
+            <button class="test-button" onclick="testMalformedJSON()">Test Malformed JSON</button>
+            <div id="validation-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Storage Quota Tests</h2>
+            <button class="test-button" onclick="testLargeDataWarning()">Test Large Data Warning</button>
+            <button class="test-button" onclick="simulateQuotaExceeded()">Simulate Quota Exceeded</button>
+            <button class="test-button" onclick="clearTestData()">Clear Test Data</button>
+            <div id="quota-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Warning System Tests</h2>
+            <button class="test-button" onclick="testWarningDisplay()">Test Warning Display</button>
+            <button class="test-button" onclick="testPersistentWarning()">Test Persistent Warning</button>
+            <button class="test-button" onclick="testMultipleWarnings()">Test Multiple Warnings</button>
+            <div id="warning-results" class="test-results"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Test functions for storage error handling
+        
+        function testStorageAvailability() {
+            const results = document.getElementById('availability-results');
+            const available = isStorageAvailable();
+            results.textContent = `Storage Available: ${available}\n`;
+            
+            if (available) {
+                try {
+                    localStorage.setItem('test-key', 'test-value');
+                    const retrieved = localStorage.getItem('test-key');
+                    localStorage.removeItem('test-key');
+                    results.textContent += `Read/Write Test: ${retrieved === 'test-value' ? 'PASS' : 'FAIL'}\n`;
+                } catch (error) {
+                    results.textContent += `Read/Write Test: FAIL - ${error.message}\n`;
+                }
+            }
+        }
+        
+        function testStorageInfo() {
+            const results = document.getElementById('availability-results');
+            const info = getStorageInfo();
+            results.textContent = `Storage Info:\n${JSON.stringify(info, null, 2)}\n`;
+        }
+        
+        function testStorageRecovery() {
+            const results = document.getElementById('availability-results');
+            const success = attemptStorageRecovery();
+            results.textContent = `Storage Recovery: ${success ? 'SUCCESS' : 'FAILED'}\n`;
+        }
+        
+        function testCorruptedData() {
+            const results = document.getElementById('validation-results');
+            
+            // Save corrupted data
+            try {
+                localStorage.setItem('taskDashboardTasks', '{"invalid": "json"');
+                results.textContent = 'Saved corrupted JSON data\n';
+                
+                // Try to load it
+                const loaded = loadTasksFromStorage();
+                results.textContent += `Loaded tasks: ${JSON.stringify(loaded)}\n`;
+                results.textContent += `Result: ${Array.isArray(loaded) && loaded.length === 0 ? 'PASS' : 'FAIL'}\n`;
+                
+            } catch (error) {
+                results.textContent += `Error: ${error.message}\n`;
+            }
+        }
+        
+        function testInvalidTaskData() {
+            const results = document.getElementById('validation-results');
+            
+            const invalidTasks = [
+                { id: 'valid-1', name: 'Valid Task', category: 'Work', completed: true, time: '' },
+                { id: '', name: 'Invalid ID', category: 'Work', completed: true, time: '' },
+                { id: 'invalid-2', name: '', category: 'Work', completed: true, time: '' },
+                { id: 'invalid-3', name: 'Invalid Category', category: 'Invalid', completed: true, time: '' },
+                { id: 'invalid-4', name: 'Invalid Time', category: 'Work', completed: true, time: '25:99' },
+                { name: 'Missing ID', category: 'Work', completed: true, time: '' }
+            ];
+            
+            try {
+                localStorage.setItem('taskDashboardTasks', JSON.stringify(invalidTasks));
+                results.textContent = 'Saved invalid task data\n';
+                
+                const loaded = loadTasksFromStorage();
+                results.textContent += `Original tasks: ${invalidTasks.length}\n`;
+                results.textContent += `Valid tasks loaded: ${loaded.length}\n`;
+                results.textContent += `Result: ${loaded.length === 1 ? 'PASS' : 'FAIL'}\n`;
+                
+            } catch (error) {
+                results.textContent += `Error: ${error.message}\n`;
+            }
+        }
+        
+        function testMalformedJSON() {
+            const results = document.getElementById('validation-results');
+            
+            try {
+                localStorage.setItem('taskDashboardTasks', 'not json at all');
+                results.textContent = 'Saved malformed JSON\n';
+                
+                const loaded = loadTasksFromStorage();
+                results.textContent += `Loaded tasks: ${JSON.stringify(loaded)}\n`;
+                results.textContent += `Result: ${Array.isArray(loaded) && loaded.length === 0 ? 'PASS' : 'FAIL'}\n`;
+                
+            } catch (error) {
+                results.textContent += `Error: ${error.message}\n`;
+            }
+        }
+        
+        function testLargeDataWarning() {
+            const results = document.getElementById('quota-results');
+            
+            // Create a large task array (simulate > 1MB)
+            const largeTasks = [];
+            for (let i = 0; i < 10000; i++) {
+                largeTasks.push({
+                    id: `large-task-${i}`,
+                    name: `Large Task ${i} with lots of text to make it bigger and exceed the warning threshold`,
+                    category: 'Work',
+                    completed: false,
+                    time: '09:00'
+                });
+            }
+            
+            const success = saveTasksToStorage(largeTasks);
+            results.textContent = `Large data save: ${success ? 'SUCCESS' : 'FAILED'}\n`;
+            results.textContent += `Data size: ${JSON.stringify(largeTasks).length} bytes\n`;
+        }
+        
+        function simulateQuotaExceeded() {
+            const results = document.getElementById('quota-results');
+            
+            // This is a simulation - actual quota exceeded is hard to trigger reliably
+            results.textContent = 'Quota exceeded simulation:\n';
+            results.textContent += 'In a real scenario, this would fill up localStorage until it throws QuotaExceededError\n';
+            results.textContent += 'The error handling would then attempt to save only incomplete tasks as fallback\n';
+            
+            // Show what the error handling would do
+            const testTasks = [
+                { id: '1', name: 'Completed Task', category: 'Work', completed: true, time: '' },
+                { id: '2', name: 'Incomplete Task', category: 'Work', completed: false, time: '' }
+            ];
+            
+            const incompleteTasks = testTasks.filter(task => !task.completed);
+            results.textContent += `Original tasks: ${testTasks.length}\n`;
+            results.textContent += `Fallback would save: ${incompleteTasks.length} incomplete tasks\n`;
+        }
+        
+        function clearTestData() {
+            const results = document.getElementById('quota-results');
+            try {
+                localStorage.removeItem('taskDashboardTasks');
+                results.textContent = 'Test data cleared\n';
+            } catch (error) {
+                results.textContent = `Error clearing data: ${error.message}\n`;
+            }
+        }
+        
+        function testWarningDisplay() {
+            const results = document.getElementById('warning-results');
+            showStorageWarning('Test warning message');
+            results.textContent = 'Displayed test warning (should auto-dismiss in 8 seconds)\n';
+        }
+        
+        function testPersistentWarning() {
+            const results = document.getElementById('warning-results');
+            showStorageWarning('Persistent warning with close button', true);
+            results.textContent = 'Displayed persistent warning (click X to close)\n';
+        }
+        
+        function testMultipleWarnings() {
+            const results = document.getElementById('warning-results');
+            showStorageWarning('First warning');
+            setTimeout(() => showStorageWarning('Second warning'), 500);
+            setTimeout(() => showStorageWarning('Third warning'), 1000);
+            results.textContent = 'Displayed multiple warnings\n';
+        }
+        
+        // Initialize the test page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Storage Error Handling Test Page Loaded');
+        });
+    </script>
+</body>
+</html>

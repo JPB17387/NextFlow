@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Initialization Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: var(--theme-primary-bg, #ffffff);
+            color: var(--theme-text-primary, #1a202c);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid var(--theme-border, #e2e8f0);
+            border-radius: 8px;
+            background: var(--theme-secondary-bg, #f7fafc);
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .test-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        button {
+            background: var(--theme-accent, #667eea);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        /* Theme definitions for testing */
+        :root {
+            --theme-primary-bg: #ffffff;
+            --theme-secondary-bg: #f7fafc;
+            --theme-text-primary: #1a202c;
+            --theme-text-secondary: #4a5568;
+            --theme-accent: #667eea;
+            --theme-border: #e2e8f0;
+        }
+        
+        [data-theme="dark"] {
+            --theme-primary-bg: #1a202c;
+            --theme-secondary-bg: #2d3748;
+            --theme-text-primary: #f7fafc;
+            --theme-text-secondary: #e2e8f0;
+            --theme-accent: #63b3ed;
+            --theme-border: #4a5568;
+        }
+        
+        [data-theme="student"] {
+            --theme-primary-bg: #f0fff4;
+            --theme-secondary-bg: #e6fffa;
+            --theme-text-primary: #1a365d;
+            --theme-text-secondary: #2a69ac;
+            --theme-accent: #3182ce;
+            --theme-border: #bee3f8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Theme System Initialization Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="clearStorage()">Clear Storage</button>
+        <button onclick="testThemeSwitch()">Test Theme Switch</button>
+        <button onclick="showStatus()">Show Status</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Theme System Status</h2>
+        <div id="statusDisplay"></div>
+    </div>
+    
+    <script src="theme-manager.js"></script>
+    <script>
+        // Test functions
+        function addTestResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result test-${type}`;
+            resultDiv.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            resultsDiv.appendChild(resultDiv);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function clearTestResults() {
+            document.getElementById('testResults').innerHTML = '';
+        }
+        
+        function runAllTests() {
+            clearTestResults();
+            addTestResult('Starting theme initialization tests...', 'info');
+            
+            // Test 1: Theme manager availability
+            if (typeof themeManager === 'undefined') {
+                addTestResult('FAIL: Theme manager not loaded', 'fail');
+                return;
+            }
+            addTestResult('PASS: Theme manager loaded', 'pass');
+            
+            // Test 2: Initialize theme system
+            const initResult = themeManager.initializeThemeSystem();
+            if (initResult) {
+                addTestResult('PASS: Theme system initialized successfully', 'pass');
+            } else {
+                addTestResult('FAIL: Theme system initialization failed', 'fail');
+            }
+            
+            // Test 3: Check current theme
+            const currentTheme = themeManager.getCurrentTheme();
+            if (currentTheme) {
+                addTestResult(`PASS: Current theme is ${currentTheme}`, 'pass');
+            } else {
+                addTestResult('FAIL: No current theme set', 'fail');
+            }
+            
+            // Test 4: Test storage availability
+            const storageAvailable = themeManager.isStorageAvailable();
+            if (storageAvailable) {
+                addTestResult('PASS: localStorage is available', 'pass');
+            } else {
+                addTestResult('INFO: localStorage not available - persistence disabled', 'info');
+            }
+            
+            // Test 5: Test theme persistence
+            if (storageAvailable) {
+                const saveResult = themeManager.saveThemePreference('dark');
+                if (saveResult) {
+                    addTestResult('PASS: Theme preference saved', 'pass');
+                    
+                    const loadedTheme = themeManager.loadThemePreference();
+                    if (loadedTheme === 'dark') {
+                        addTestResult('PASS: Theme preference loaded correctly', 'pass');
+                    } else {
+                        addTestResult(`FAIL: Theme preference load mismatch. Expected: dark, Got: ${loadedTheme}`, 'fail');
+                    }
+                } else {
+                    addTestResult('FAIL: Could not save theme preference', 'fail');
+                }
+            }
+            
+            // Test 6: Test default theme fallback
+            localStorage.removeItem('taskDashboardTheme');
+            const defaultTheme = themeManager.loadThemePreference();
+            if (defaultTheme === null) {
+                addTestResult('PASS: Default theme fallback works (returns null for default)', 'pass');
+            } else {
+                addTestResult(`INFO: Loaded theme: ${defaultTheme}`, 'info');
+            }
+            
+            // Test 7: Test invalid theme handling
+            if (storageAvailable) {
+                localStorage.setItem('taskDashboardTheme', 'invalid-theme');
+                const invalidTheme = themeManager.loadThemePreference();
+                if (invalidTheme === null) {
+                    addTestResult('PASS: Invalid theme handled correctly (cleared and returned null)', 'pass');
+                } else {
+                    addTestResult(`FAIL: Invalid theme not handled. Got: ${invalidTheme}`, 'fail');
+                }
+            }
+            
+            addTestResult('All tests completed!', 'info');
+            showStatus();
+        }
+        
+        function clearStorage() {
+            try {
+                localStorage.removeItem('taskDashboardTheme');
+                addTestResult('Storage cleared', 'info');
+            } catch (error) {
+                addTestResult(`Error clearing storage: ${error.message}`, 'fail');
+            }
+        }
+        
+        function testThemeSwitch() {
+            const themes = ['white', 'dark', 'student', 'developer', 'professional'];
+            let currentIndex = 0;
+            
+            const switchTheme = () => {
+                const theme = themes[currentIndex];
+                const success = themeManager.setTheme(theme);
+                
+                if (success) {
+                    addTestResult(`Theme switched to: ${theme}`, 'pass');
+                } else {
+                    addTestResult(`Failed to switch to: ${theme}`, 'fail');
+                }
+                
+                currentIndex = (currentIndex + 1) % themes.length;
+                
+                if (currentIndex === 0) {
+                    addTestResult('Theme switching test completed', 'info');
+                } else {
+                    setTimeout(switchTheme, 1000);
+                }
+            };
+            
+            addTestResult('Starting theme switching test...', 'info');
+            switchTheme();
+        }
+        
+        function showStatus() {
+            const statusDiv = document.getElementById('statusDisplay');
+            
+            if (typeof themeManager === 'undefined') {
+                statusDiv.innerHTML = '<div class="test-fail">Theme manager not available</div>';
+                return;
+            }
+            
+            const status = themeManager.getStatus();
+            const statusHtml = `
+                <div class="test-info">
+                    <strong>Theme System Status:</strong><br>
+                    Initialized: ${status.initialized}<br>
+                    Current Theme: ${status.currentTheme}<br>
+                    Storage Available: ${status.storageAvailable}<br>
+                    CSS Supported: ${status.cssSupported}<br>
+                    Has Stored Preference: ${status.hasStoredPreference}<br>
+                    Available Themes: ${status.availableThemes.join(', ')}
+                </div>
+            `;
+            statusDiv.innerHTML = statusHtml;
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            addTestResult('Page loaded, theme manager available: ' + (typeof themeManager !== 'undefined'), 'info');
+            showStatus();
+        });
+    </script>
+</body>
+</html>

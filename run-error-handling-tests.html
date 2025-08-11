@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run Error Handling Tests - Task Dashboard MVP</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Error Handling Test Runner</h1>
+            <div class="clock-section">
+                <div id="clock">Loading...</div>
+                <div id="date">Loading...</div>
+            </div>
+        </header>
+
+        <div class="test-info">
+            <h2>Automated Error Handling Tests</h2>
+            <p>This page will automatically run comprehensive error handling tests for the Task Dashboard MVP storage system.</p>
+            <p><strong>Check the browser console (F12) for detailed test results.</strong></p>
+            <p>Warning messages will also appear on this page to test the notification system.</p>
+        </div>
+
+        <!-- Include the main task form for testing -->
+        <section class="task-form-section">
+            <h2>Add New Task</h2>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="taskName">Task Name</label>
+                    <input type="text" id="taskName" placeholder="Enter task name" maxlength="100" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskCategory">Category</label>
+                    <select id="taskCategory" required>
+                        <option value="">Select category</option>
+                        <option value="Work">Work</option>
+                        <option value="Study">Study</option>
+                        <option value="Personal">Personal</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskTime">Time (Optional)</label>
+                    <input type="time" id="taskTime">
+                </div>
+                
+                <button type="button" id="addTaskBtn" class="add-task-btn">Add Task</button>
+            </form>
+        </section>
+
+        <section class="task-list-section">
+            <h2>Your Tasks</h2>
+            <div id="taskList" class="task-list">
+                <!-- Tasks will be rendered here -->
+            </div>
+        </section>
+
+        <section class="progress-section">
+            <h2>Progress</h2>
+            <div id="progressContainer" class="progress-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div id="progressBar" class="progress-bar"></div>
+                <span id="progressLabel" class="progress-label">0%</span>
+            </div>
+        </section>
+
+        <section class="suggestions-section">
+            <h2>Productivity Suggestions</h2>
+            <button id="suggestionBtn" class="suggestion-btn">Get Suggestion</button>
+            <textarea id="suggestionText" class="suggestion-text" readonly placeholder="Click the button above for a productivity tip!"></textarea>
+        </section>
+    </div>
+
+    <footer>
+        <p>© 2025 Jhon Paul Baonil • Associated with CodeSprout Hack.</p>
+    </footer>
+
+    <!-- Load main application script -->
+    <script src="script.js"></script>
+    
+    <!-- Load and run comprehensive tests -->
+    <script src="test-comprehensive-error-handling.js"></script>
+</body>
+</html>

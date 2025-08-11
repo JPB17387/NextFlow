@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Manager Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: var(--theme-primary-bg);
+            color: var(--theme-text-primary);
+            border: 1px solid var(--theme-border-light);
+            border-radius: 8px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--theme-secondary-bg);
+            border-radius: 6px;
+        }
+        .theme-button {
+            margin: 5px;
+            padding: 8px 16px;
+            background: var(--theme-accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .theme-button:hover {
+            background: var(--theme-accent-hover);
+        }
+        .status-display {
+            font-family: monospace;
+            background: var(--theme-secondary-bg);
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Theme Manager Test</h1>
+        
+        <div class="test-section">
+            <h2>Theme Controls</h2>
+            <button class="theme-button" onclick="testSetTheme('white')">White Theme</button>
+            <button class="theme-button" onclick="testSetTheme('dark')">Dark Theme</button>
+            <button class="theme-button" onclick="testSetTheme('student')">Student Theme</button>
+            <button class="theme-button" onclick="testSetTheme('developer')">Developer Theme</button>
+            <button class="theme-button" onclick="testSetTheme('professional')">Professional Theme</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>Current Status</h2>
+            <div id="statusDisplay" class="status-display">Loading...</div>
+            <button class="theme-button" onclick="updateStatus()">Refresh Status</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>Error Testing</h2>
+            <button class="theme-button" onclick="testInvalidTheme()">Test Invalid Theme</button>
+            <button class="theme-button" onclick="testReset()">Reset Theme System</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>Available Themes</h2>
+            <div id="themesDisplay" class="status-display">Loading...</div>
+        </div>
+    </div>
+
+    <script src="theme-manager.js"></script>
+    <script>
+        // Test functions
+        function testSetTheme(themeName) {
+            console.log(`Testing theme: ${themeName}`);
+            const success = themeManager.setTheme(themeName);
+            console.log(`Theme set result: ${success}`);
+            updateStatus();
+        }
+        
+        function testInvalidTheme() {
+            console.log('Testing invalid theme');
+            const success = themeManager.setTheme('invalid-theme');
+            console.log(`Invalid theme result: ${success}`);
+            updateStatus();
+        }
+        
+        function testReset() {
+            console.log('Testing theme reset');
+            const success = themeManager.reset();
+            console.log(`Reset result: ${success}`);
+            updateStatus();
+        }
+        
+        function updateStatus() {
+            const status = themeManager.getStatus();
+            const statusDisplay = document.getElementById('statusDisplay');
+            statusDisplay.textContent = JSON.stringify(status, null, 2);
+        }
+        
+        function displayAvailableThemes() {
+            const themes = themeManager.getAvailableThemes();
+            const themesDisplay = document.getElementById('themesDisplay');
+            themesDisplay.textContent = JSON.stringify(themes, null, 2);
+        }
+        
+        // Initialize test
+        function initTest() {
+            console.log('Initializing theme manager test');
+            themeManager.initializeThemeSystem();
+            updateStatus();
+            displayAvailableThemes();
+            
+            // Listen for theme change events
+            document.addEventListener('themeChanged', function(event) {
+                console.log('Theme changed event:', event.detail);
+                updateStatus();
+            });
+        }
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTest);
+        } else {
+            initTest();
+        }
+    </script>
+</body>
+</html>

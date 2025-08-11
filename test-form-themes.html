@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Theme Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { margin: 0; background: #f0f0f0; }
+        .theme-test-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .theme-preview {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .theme-label {
+            background: #333;
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .form-container {
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-test-container">
+        <!-- White Theme -->
+        <div class="theme-preview" data-theme="white">
+            <div class="theme-label">White Theme</div>
+            <div class="form-container">
+                <section class="task-form-section">
+                    <h2>Add New Task</h2>
+                    <form>
+                        <div class="form-group">
+                            <label for="taskName1">Task Name: <span>*</span></label>
+                            <input type="text" id="taskName1" placeholder="Enter task name" value="Sample task">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskCategory1">Category: <span>*</span></label>
+                            <select id="taskCategory1">
+                                <option value="">Select category</option>
+                                <option value="Work" selected>Work</option>
+                                <option value="Study">Study</option>
+                                <option value="Personal">Personal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTime1">Scheduled Time:</label>
+                            <input type="time" id="taskTime1" value="14:30">
+                        </div>
+                        <button type="button" id="addTaskBtn1">Add Task</button>
+                    </form>
+                    <div class="error-message">This is an error message</div>
+                    <div class="success-message">Task added successfully!</div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Dark Theme -->
+        <div class="theme-preview" data-theme="dark">
+            <div class="theme-label">Dark Theme</div>
+            <div class="form-container">
+                <section class="task-form-section">
+                    <h2>Add New Task</h2>
+                    <form>
+                        <div class="form-group">
+                            <label for="taskName2">Task Name: <span>*</span></label>
+                            <input type="text" id="taskName2" placeholder="Enter task name" value="Sample task">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskCategory2">Category: <span>*</span></label>
+                            <select id="taskCategory2">
+                                <option value="">Select category</option>
+                                <option value="Work" selected>Work</option>
+                                <option value="Study">Study</option>
+                                <option value="Personal">Personal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTime2">Scheduled Time:</label>
+                            <input type="time" id="taskTime2" value="14:30">
+                        </div>
+                        <button type="button" id="addTaskBtn2">Add Task</button>
+                    </form>
+                    <div class="error-message">This is an error message</div>
+                    <div class="success-message">Task added successfully!</div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Student Theme -->
+        <div class="theme-preview" data-theme="student">
+            <div class="theme-label">Student Theme</div>
+            <div class="form-container">
+                <section class="task-form-section">
+                    <h2>Add New Task</h2>
+                    <form>
+                        <div class="form-group">
+                            <label for="taskName3">Task Name: <span>*</span></label>
+                            <input type="text" id="taskName3" placeholder="Enter task name" value="Sample task">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskCategory3">Category: <span>*</span></label>
+                            <select id="taskCategory3">
+                                <option value="">Select category</option>
+                                <option value="Work" selected>Work</option>
+                                <option value="Study">Study</option>
+                                <option value="Personal">Personal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTime3">Scheduled Time:</label>
+                            <input type="time" id="taskTime3" value="14:30">
+                        </div>
+                        <button type="button" id="addTaskBtn3">Add Task</button>
+                    </form>
+                    <div class="error-message">This is an error message</div>
+                    <div class="success-message">Task added successfully!</div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Developer Theme -->
+        <div class="theme-preview" data-theme="developer">
+            <div class="theme-label">Developer Theme</div>
+            <div class="form-container">
+                <section class="task-form-section">
+                    <h2>Add New Task</h2>
+                    <form>
+                        <div class="form-group">
+                            <label for="taskName4">Task Name: <span>*</span></label>
+                            <input type="text" id="taskName4" placeholder="Enter task name" value="Sample task">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskCategory4">Category: <span>*</span></label>
+                            <select id="taskCategory4">
+                                <option value="">Select category</option>
+                                <option value="Work" selected>Work</option>
+                                <option value="Study">Study</option>
+                                <option value="Personal">Personal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTime4">Scheduled Time:</label>
+                            <input type="time" id="taskTime4" value="14:30">
+                        </div>
+                        <button type="button" id="addTaskBtn4">Add Task</button>
+                    </form>
+                    <div class="error-message">This is an error message</div>
+                    <div class="success-message">Task added successfully!</div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Professional Theme -->
+        <div class="theme-preview" data-theme="professional">
+            <div class="theme-label">Professional Theme</div>
+            <div class="form-container">
+                <section class="task-form-section">
+                    <h2>Add New Task</h2>
+                    <form>
+                        <div class="form-group">
+                            <label for="taskName5">Task Name: <span>*</span></label>
+                            <input type="text" id="taskName5" placeholder="Enter task name" value="Sample task">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskCategory5">Category: <span>*</span></label>
+                            <select id="taskCategory5">
+                                <option value="">Select category</option>
+                                <option value="Work" selected>Work</option>
+                                <option value="Study">Study</option>
+                                <option value="Personal">Personal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTime5">Scheduled Time:</label>
+                            <input type="time" id="taskTime5" value="14:30">
+                        </div>
+                        <button type="button" id="addTaskBtn5">Add Task</button>
+                    </form>
+                    <div class="error-message">This is an error message</div>
+                    <div class="success-message">Task added successfully!</div>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

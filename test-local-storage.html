@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Storage Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Local Storage Functionality Test</h1>
+    
+    <div id="test-results"></div>
+    
+    <button onclick="runTests()">Run Tests</button>
+    <button onclick="clearTestData()">Clear Test Data</button>
+    
+    <script>
+        // Import the storage functions from our main script
+        const STORAGE_KEY = 'taskDashboardTasks';
+        
+        function isStorageAvailable() {
+            try {
+                const test = '__storage_test__';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        function loadTasksFromStorage() {
+            try {
+                if (!isStorageAvailable()) return [];
+                const storedTasks = localStorage.getItem(STORAGE_KEY);
+                if (!storedTasks) return [];
+                const parsedTasks = JSON.parse(storedTasks);
+                if (!Array.isArray(parsedTasks)) return [];
+                return parsedTasks.filter(task => {
+                    return task && 
+                           typeof task.id === 'string' && 
+                           typeof task.name === 'string' && 
+                           typeof task.category === 'string' && 
+                           typeof task.completed === 'boolean' &&
+                           (typeof task.time === 'string' || task.time === '');
+                });
+            } catch (error) {
+                return [];
+            }
+        }
+        
+        function saveTasksToStorage(tasksToSave) {
+            try {
+                if (!isStorageAvailable()) return false;
+                const tasksJson = JSON.stringify(tasksToSave);
+                localStorage.setItem(STORAGE_KEY, tasksJson);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        function addTestResult(testName, passed, message) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            resultDiv.innerHTML = `<strong>${testName}:</strong> ${passed ? 'PASS' : 'FAIL'} - ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        function runTests() {
+            document.getElementById('test-results').innerHTML = '';
+            
+            // Test 1: Storage availability
+            const storageAvailable = isStorageAvailable();
+            addTestResult('Storage Availability', storageAvailable, 
+                storageAvailable ? 'localStorage is available' : 'localStorage is not available');
+            
+            if (!storageAvailable) {
+                addTestResult('All Tests', false, 'Cannot run tests without localStorage');
+                return;
+            }
+            
+            // Test 2: Save and load empty array
+            const emptyTasks = [];
+            const saveEmpty = saveTasksToStorage(emptyTasks);
+            const loadEmpty = loadTasksFromStorage();
+            addTestResult('Empty Array Save/Load', saveEmpty && Array.isArray(loadEmpty) && loadEmpty.length === 0,
+                `Saved: ${saveEmpty}, Loaded: ${JSON.stringify(loadEmpty)}`);
+            
+            // Test 3: Save and load tasks
+            const testTasks = [
+                {
+                    id: 'test1',
+                    name: 'Test Task 1',
+                    category: 'Work',
+                    time: '09:00',
+                    completed: false
+                },
+                {
+                    id: 'test2',
+                    name: 'Test Task 2',
+                    category: 'Personal',
+                    time: '',
+                    completed: true
+                }
+            ];
+            
+            const saveTest = saveTasksToStorage(testTasks);
+            const loadTest = loadTasksFromStorage();
+            const tasksMatch = JSON.stringify(testTasks) === JSON.stringify(loadTest);
+            addTestResult('Task Save/Load', saveTest && tasksMatch,
+                `Saved: ${saveTest}, Tasks match: ${tasksMatch}`);
+            
+            // Test 4: Data validation
+            const invalidTasks = [
+                { id: 'valid', name: 'Valid Task', category: 'Work', time: '', completed: false },
+                { id: 123, name: 'Invalid ID', category: 'Work', time: '', completed: false }, // Invalid ID type
+                { name: 'Missing ID', category: 'Work', time: '', completed: false }, // Missing ID
+                'not an object' // Not an object
+            ];
+            
+            saveTasksToStorage(invalidTasks);
+            const validatedTasks = loadTasksFromStorage();
+            const onlyValidTask = validatedTasks.length === 1 && validatedTasks[0].id === 'valid';
+            addTestResult('Data Validation', onlyValidTask,
+                `Filtered ${invalidTasks.length} items to ${validatedTasks.length} valid tasks`);
+            
+            // Test 5: Clear storage
+            localStorage.removeItem(STORAGE_KEY);
+            const clearedTasks = loadTasksFromStorage();
+            addTestResult('Storage Clear', clearedTasks.length === 0,
+                `Tasks after clear: ${clearedTasks.length}`);
+        }
+        
+        function clearTestData() {
+            localStorage.removeItem(STORAGE_KEY);
+            document.getElementById('test-results').innerHTML = '<div class="test-result pass">Test data cleared</div>';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Transitions Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Theme Transitions Test</h1>
+        <div class="header-controls">
+            <div class="time-display">
+                <div id="clock">12:00:00 PM</div>
+                <div id="date">Test Date</div>
+            </div>
+            <div class="theme-selector">
+                <button id="themeToggle" class="theme-toggle-btn" aria-expanded="false" aria-haspopup="true">
+                    <span class="theme-icon">🎨</span>
+                    <span class="theme-label">Light Theme</span>
+                    <span class="theme-arrow">▼</span>
+                </button>
+                <ul id="themeDropdown" class="theme-dropdown" role="menu" aria-hidden="true">
+                    <li class="theme-option" role="menuitem" data-theme="white" aria-selected="true">
+                        <div class="theme-preview" style="background: linear-gradient(45deg, #ffffff, #f7fafc);"></div>
+                        <span class="theme-name">Light Theme</span>
+                    </li>
+                    <li class="theme-option" role="menuitem" data-theme="dark">
+                        <div class="theme-preview" style="background: linear-gradient(45deg, #1a202c, #2d3748);"></div>
+                        <span class="theme-name">Dark Theme</span>
+                    </li>
+                    <li class="theme-option" role="menuitem" data-theme="student">
+                        <div class="theme-preview" style="background: linear-gradient(45deg, #f0fff4, #e6fffa);"></div>
+                        <span class="theme-name">Student Theme</span>
+                    </li>
+                    <li class="theme-option" role="menuitem" data-theme="developer">
+                        <div class="theme-preview" style="background: linear-gradient(45deg, #0d1117, #161b22);"></div>
+                        <span class="theme-name">Developer Theme</span>
+                    </li>
+                    <li class="theme-option" role="menuitem" data-theme="professional">
+                        <div class="theme-preview" style="background: linear-gradient(45deg, #fafafa, #f5f5f5);"></div>
+                        <span class="theme-name">Professional Theme</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="task-form-section">
+            <h2>Test Form</h2>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="taskName">Task Name</label>
+                    <input type="text" id="taskName" placeholder="Enter a task name to test transitions">
+                </div>
+                <div class="form-group">
+                    <label for="taskCategory">Category</label>
+                    <select id="taskCategory">
+                        <option value="">Select Category</option>
+                        <option value="Work">Work</option>
+                        <option value="Study">Study</option>
+                        <option value="Personal">Personal</option>
+                    </select>
+                </div>
+                <button type="button" id="addTaskBtn">Test Button</button>
+            </form>
+        </section>
+
+        <section class="task-list-section">
+            <h2>Test Elements</h2>
+            <div id="taskList">
+                <div class="task-item">
+                    <input type="checkbox" class="task-checkbox">
+                    <div class="task-content">
+                        <div class="task-name">Sample Task</div>
+                        <div class="task-meta">
+                            <span class="task-category work">Work</span>
+                            <span class="task-time">2:30 PM</span>
+                        </div>
+                    </div>
+                    <button class="task-delete">Delete</button>
+                </div>
+                <div class="task-item completed">
+                    <input type="checkbox" class="task-checkbox" checked>
+                    <div class="task-content">
+                        <div class="task-name">Completed Task</div>
+                        <div class="task-meta">
+                            <span class="task-category study">Study</span>
+                        </div>
+                    </div>
+                    <button class="task-delete">Delete</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="progress-section">
+            <h2>Progress Test</h2>
+            <div id="progressContainer" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+                <div id="progressBar" style="width: 60%;"></div>
+            </div>
+            <span id="progressLabel">60%</span>
+        </section>
+
+        <section class="suggestions-section">
+            <h2>Suggestions Test</h2>
+            <button id="suggestionBtn">Get Suggestion</button>
+            <textarea id="suggestionText" placeholder="Test textarea for transitions..."></textarea>
+        </section>
+    </main>
+
+    <footer>
+        <p>Theme Transitions Test - Check that all elements transition smoothly</p>
+    </footer>
+
+    <script src="theme-manager.js"></script>
+    <script>
+        // Initialize theme system
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme manager
+            themeManager.initializeThemeSystem();
+            
+            // Set up theme selector
+            const themeToggle = document.getElementById('themeToggle');
+            const themeDropdown = document.getElementById('themeDropdown');
+            const themeOptions = document.querySelectorAll('.theme-option');
+            
+            // Toggle dropdown
+            themeToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const isExpanded = themeToggle.getAttribute('aria-expanded') === 'true';
+                themeToggle.setAttribute('aria-expanded', !isExpanded);
+                themeDropdown.setAttribute('aria-hidden', isExpanded);
+            });
+            
+            // Handle theme selection
+            themeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const themeName = this.getAttribute('data-theme');
+                    
+                    // Apply theme with transitions
+                    themeManager.setTheme(themeName);
+                    
+                    // Update UI
+                    themeOptions.forEach(opt => opt.setAttribute('aria-selected', 'false'));
+                    this.setAttribute('aria-selected', 'true');
+                    
+                    // Update button text
+                    const themeConfig = themeManager.getThemeConfig(themeName);
+                    if (themeConfig) {
+                        document.querySelector('.theme-label').textContent = themeConfig.displayName;
+                    }
+                    
+                    // Close dropdown
+                    themeToggle.setAttribute('aria-expanded', 'false');
+                    themeDropdown.setAttribute('aria-hidden', 'true');
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!themeToggle.contains(e.target) && !themeDropdown.contains(e.target)) {
+                    themeToggle.setAttribute('aria-expanded', 'false');
+                    themeDropdown.setAttribute('aria-hidden', 'true');
+                }
+            });
+            
+            // Test form preservation
+            document.getElementById('taskName').addEventListener('input', function() {
+                console.log('Form input detected:', this.value);
+            });
+            
+            // Add test button functionality
+            document.getElementById('addTaskBtn').addEventListener('click', function() {
+                alert('Button clicked - form state should be preserved during theme changes');
+            });
+            
+            document.getElementById('suggestionBtn').addEventListener('click', function() {
+                document.getElementById('suggestionText').value = 'Test suggestion text - this should transition smoothly';
+                document.getElementById('suggestionText').classList.add('suggestion-updated');
+                setTimeout(() => {
+                    document.getElementById('suggestionText').classList.remove('suggestion-updated');
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>

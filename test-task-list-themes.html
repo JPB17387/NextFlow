@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List Theme Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { margin: 0; background: #f0f0f0; }
+        .theme-test-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .theme-preview {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .theme-label {
+            background: #333;
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .list-container {
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-test-container">
+        <!-- White Theme -->
+        <div class="theme-preview" data-theme="white">
+            <div class="theme-label">White Theme</div>
+            <div class="list-container">
+                <section class="task-list-section">
+                    <h2>Your Tasks</h2>
+                    <div id="taskList1">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Complete project proposal</div>
+                                <div class="task-meta">
+                                    <span class="task-category work">Work</span>
+                                    <span class="task-time">2:30 PM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item completed">
+                            <input type="checkbox" class="task-checkbox" checked>
+                            <div class="task-content">
+                                <div class="task-name">Study for exam</div>
+                                <div class="task-meta">
+                                    <span class="task-category study">Study</span>
+                                    <span class="task-time">10:00 AM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Buy groceries</div>
+                                <div class="task-meta">
+                                    <span class="task-category personal">Personal</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Dark Theme -->
+        <div class="theme-preview" data-theme="dark">
+            <div class="theme-label">Dark Theme</div>
+            <div class="list-container">
+                <section class="task-list-section">
+                    <h2>Your Tasks</h2>
+                    <div id="taskList2">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Complete project proposal</div>
+                                <div class="task-meta">
+                                    <span class="task-category work">Work</span>
+                                    <span class="task-time">2:30 PM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item completed">
+                            <input type="checkbox" class="task-checkbox" checked>
+                            <div class="task-content">
+                                <div class="task-name">Study for exam</div>
+                                <div class="task-meta">
+                                    <span class="task-category study">Study</span>
+                                    <span class="task-time">10:00 AM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Buy groceries</div>
+                                <div class="task-meta">
+                                    <span class="task-category personal">Personal</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Student Theme -->
+        <div class="theme-preview" data-theme="student">
+            <div class="theme-label">Student Theme</div>
+            <div class="list-container">
+                <section class="task-list-section">
+                    <h2>Your Tasks</h2>
+                    <div id="taskList3">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Complete project proposal</div>
+                                <div class="task-meta">
+                                    <span class="task-category work">Work</span>
+                                    <span class="task-time">2:30 PM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item completed">
+                            <input type="checkbox" class="task-checkbox" checked>
+                            <div class="task-content">
+                                <div class="task-name">Study for exam</div>
+                                <div class="task-meta">
+                                    <span class="task-category study">Study</span>
+                                    <span class="task-time">10:00 AM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Buy groceries</div>
+                                <div class="task-meta">
+                                    <span class="task-category personal">Personal</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Developer Theme -->
+        <div class="theme-preview" data-theme="developer">
+            <div class="theme-label">Developer Theme</div>
+            <div class="list-container">
+                <section class="task-list-section">
+                    <h2>Your Tasks</h2>
+                    <div id="taskList4">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Complete project proposal</div>
+                                <div class="task-meta">
+                                    <span class="task-category work">Work</span>
+                                    <span class="task-time">2:30 PM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item completed">
+                            <input type="checkbox" class="task-checkbox" checked>
+                            <div class="task-content">
+                                <div class="task-name">Study for exam</div>
+                                <div class="task-meta">
+                                    <span class="task-category study">Study</span>
+                                    <span class="task-time">10:00 AM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Buy groceries</div>
+                                <div class="task-meta">
+                                    <span class="task-category personal">Personal</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Professional Theme -->
+        <div class="theme-preview" data-theme="professional">
+            <div class="theme-label">Professional Theme</div>
+            <div class="list-container">
+                <section class="task-list-section">
+                    <h2>Your Tasks</h2>
+                    <div id="taskList5">
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Complete project proposal</div>
+                                <div class="task-meta">
+                                    <span class="task-category work">Work</span>
+                                    <span class="task-time">2:30 PM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item completed">
+                            <input type="checkbox" class="task-checkbox" checked>
+                            <div class="task-content">
+                                <div class="task-name">Study for exam</div>
+                                <div class="task-meta">
+                                    <span class="task-category study">Study</span>
+                                    <span class="task-time">10:00 AM</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                        <div class="task-item">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-name">Buy groceries</div>
+                                <div class="task-meta">
+                                    <span class="task-category personal">Personal</span>
+                                </div>
+                            </div>
+                            <button class="task-delete">Delete</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

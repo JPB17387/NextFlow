@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Theme Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { margin: 0; }
+        .theme-test-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            background: #f0f0f0;
+        }
+        .theme-preview {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .theme-label {
+            background: #333;
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-test-container">
+        <!-- White Theme -->
+        <div class="theme-preview" data-theme="white">
+            <div class="theme-label">White Theme</div>
+            <header role="banner">
+                <h1>Task Dashboard</h1>
+                <div class="header-controls">
+                    <div class="time-display">
+                        <div id="clock1">2:30:45 PM</div>
+                        <div id="date1">Monday, January 8, 2025</div>
+                    </div>
+                </div>
+            </header>
+        </div>
+
+        <!-- Dark Theme -->
+        <div class="theme-preview" data-theme="dark">
+            <div class="theme-label">Dark Theme</div>
+            <header role="banner">
+                <h1>Task Dashboard</h1>
+                <div class="header-controls">
+                    <div class="time-display">
+                        <div id="clock2">2:30:45 PM</div>
+                        <div id="date2">Monday, January 8, 2025</div>
+                    </div>
+                </div>
+            </header>
+        </div>
+
+        <!-- Student Theme -->
+        <div class="theme-preview" data-theme="student">
+            <div class="theme-label">Student Theme</div>
+            <header role="banner">
+                <h1>Task Dashboard</h1>
+                <div class="header-controls">
+                    <div class="time-display">
+                        <div id="clock3">2:30:45 PM</div>
+                        <div id="date3">Monday, January 8, 2025</div>
+                    </div>
+                </div>
+            </header>
+        </div>
+
+        <!-- Developer Theme -->
+        <div class="theme-preview" data-theme="developer">
+            <div class="theme-label">Developer Theme</div>
+            <header role="banner">
+                <h1>Task Dashboard</h1>
+                <div class="header-controls">
+                    <div class="time-display">
+                        <div id="clock4">2:30:45 PM</div>
+                        <div id="date4">Monday, January 8, 2025</div>
+                    </div>
+                </div>
+            </header>
+        </div>
+
+        <!-- Professional Theme -->
+        <div class="theme-preview" data-theme="professional">
+            <div class="theme-label">Professional Theme</div>
+            <header role="banner">
+                <h1>Task Dashboard</h1>
+                <div class="header-controls">
+                    <div class="time-display">
+                        <div id="clock5">2:30:45 PM</div>
+                        <div id="date5">Monday, January 8, 2025</div>
+                    </div>
+                </div>
+            </header>
+        </div>
+    </div>
+</body>
+</html>

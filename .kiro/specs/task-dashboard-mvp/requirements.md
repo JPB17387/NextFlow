@@ -80,6 +80,19 @@ The Task Dashboard MVP is a simple, accessible, and responsive task management a
 
 ### Requirement 7
 
+**User Story:** As a user, I want my tasks to be saved automatically and restored when I return to the application, so that I don't lose my work when I close or refresh the browser.
+
+#### Acceptance Criteria
+
+1. WHEN I add a task THEN the system SHALL automatically save it to local storage
+2. WHEN I mark a task as complete or incomplete THEN the system SHALL update the saved data immediately
+3. WHEN I delete a task THEN the system SHALL remove it from local storage immediately
+4. WHEN I reload or revisit the application THEN the system SHALL restore all my previously saved tasks
+5. WHEN I close the browser and reopen the application THEN the system SHALL maintain all task data including completion status
+6. WHEN local storage is unavailable THEN the system SHALL continue to function normally but display a warning message
+
+### Requirement 8
+
 **User Story:** As a user, I want the application to work well on all devices and be accessible, so that I can use it anywhere and everyone can access it.
 
 #### Acceptance Criteria

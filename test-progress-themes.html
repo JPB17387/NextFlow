@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Theme Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { margin: 0; background: #f0f0f0; }
+        .theme-test-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .theme-preview {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .theme-label {
+            background: #333;
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .progress-container {
+            padding: 1rem;
+        }
+        .progress-demo {
+            margin-bottom: 2rem;
+        }
+        .progress-demo h3 {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-test-container">
+        <!-- White Theme -->
+        <div class="theme-preview" data-theme="white">
+            <div class="theme-label">White Theme</div>
+            <div class="progress-container">
+                <section class="progress-section">
+                    <h2>Progress</h2>
+                    
+                    <div class="progress-demo">
+                        <h3>25% Complete</h3>
+                        <div id="progressContainer1" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar1" style="width: 25%;"></div>
+                            <span id="progressLabel1" aria-live="polite">25%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>75% Complete</h3>
+                        <div id="progressContainer2" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar2" style="width: 75%;"></div>
+                            <span id="progressLabel2" aria-live="polite">75%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>100% Complete</h3>
+                        <div id="progressContainer3" class="complete" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar3" style="width: 100%;"></div>
+                            <span id="progressLabel3" aria-live="polite">100%</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Dark Theme -->
+        <div class="theme-preview" data-theme="dark">
+            <div class="theme-label">Dark Theme</div>
+            <div class="progress-container">
+                <section class="progress-section">
+                    <h2>Progress</h2>
+                    
+                    <div class="progress-demo">
+                        <h3>25% Complete</h3>
+                        <div id="progressContainer4" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar4" style="width: 25%;"></div>
+                            <span id="progressLabel4" aria-live="polite">25%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>75% Complete</h3>
+                        <div id="progressContainer5" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar5" style="width: 75%;"></div>
+                            <span id="progressLabel5" aria-live="polite">75%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>100% Complete</h3>
+                        <div id="progressContainer6" class="complete" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar6" style="width: 100%;"></div>
+                            <span id="progressLabel6" aria-live="polite">100%</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Student Theme -->
+        <div class="theme-preview" data-theme="student">
+            <div class="theme-label">Student Theme</div>
+            <div class="progress-container">
+                <section class="progress-section">
+                    <h2>Progress</h2>
+                    
+                    <div class="progress-demo">
+                        <h3>25% Complete</h3>
+                        <div id="progressContainer7" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar7" style="width: 25%;"></div>
+                            <span id="progressLabel7" aria-live="polite">25%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>75% Complete</h3>
+                        <div id="progressContainer8" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar8" style="width: 75%;"></div>
+                            <span id="progressLabel8" aria-live="polite">75%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>100% Complete</h3>
+                        <div id="progressContainer9" class="complete" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar9" style="width: 100%;"></div>
+                            <span id="progressLabel9" aria-live="polite">100%</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Developer Theme -->
+        <div class="theme-preview" data-theme="developer">
+            <div class="theme-label">Developer Theme</div>
+            <div class="progress-container">
+                <section class="progress-section">
+                    <h2>Progress</h2>
+                    
+                    <div class="progress-demo">
+                        <h3>25% Complete</h3>
+                        <div id="progressContainer10" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar10" style="width: 25%;"></div>
+                            <span id="progressLabel10" aria-live="polite">25%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>75% Complete</h3>
+                        <div id="progressContainer11" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar11" style="width: 75%;"></div>
+                            <span id="progressLabel11" aria-live="polite">75%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>100% Complete</h3>
+                        <div id="progressContainer12" class="complete" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar12" style="width: 100%;"></div>
+                            <span id="progressLabel12" aria-live="polite">100%</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Professional Theme -->
+        <div class="theme-preview" data-theme="professional">
+            <div class="theme-label">Professional Theme</div>
+            <div class="progress-container">
+                <section class="progress-section">
+                    <h2>Progress</h2>
+                    
+                    <div class="progress-demo">
+                        <h3>25% Complete</h3>
+                        <div id="progressContainer13" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar13" style="width: 25%;"></div>
+                            <span id="progressLabel13" aria-live="polite">25%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>75% Complete</h3>
+                        <div id="progressContainer14" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar14" style="width: 75%;"></div>
+                            <span id="progressLabel14" aria-live="polite">75%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-demo">
+                        <h3>100% Complete</h3>
+                        <div id="progressContainer15" class="complete" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                            <div id="progressBar15" style="width: 100%;"></div>
+                            <span id="progressLabel15" aria-live="polite">100%</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
