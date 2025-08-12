@@ -1,4 +1,4 @@
-# Task Dashboard MVP
+# NextFlow
 
 A simple, accessible, and responsive task management application built with vanilla HTML, CSS, and JavaScript. 
 
