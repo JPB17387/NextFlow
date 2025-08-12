@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Switching Functionality Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .theme-preview {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #ccc;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .current-theme-display {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .test-log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Theme Switching Functionality Test Suite</h1>
+    <p>This test verifies that all five themes apply correctly, theme persistence works across browser sessions, and the theme selector UI works on all screen sizes.</p>
+    
+    <div class="test-container">
+        <h2>Test Results Summary</h2>
+        <div id="testSummary">
+            <div class="test-info">Tests will run automatically when the page loads...</div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Current Theme Status</h2>
+        <div class="current-theme-display" id="currentThemeDisplay">
+            Loading theme information...
+        </div>
+        <div id="themeDetails"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Manual Theme Testing</h2>
+        <p>Click each button to test theme switching manually:</p>
+        <button class="test-button" onclick="testTheme('white')">
+            <span class="theme-preview" style="background: #ffffff; border-color: #e2e8f0;"></span>
+            Test Light Theme
+        </button>
+        <button class="test-button" onclick="testTheme('dark')">
+            <span class="theme-preview" style="background: #1a202c;"></span>
+            Test Dark Theme
+        </button>
+        <button class="test-button" onclick="testTheme('student')">
+            <span class="theme-preview" style="background: #3182ce;"></span>
+            Test Student Theme
+        </button>
+        <button class="test-button" onclick="testTheme('developer')">
+            <span class="theme-preview" style="background: #0d1117;"></span>
+            Test Developer Theme
+        </button>
+        <button class="test-button" onclick="testTheme('professional')">
+            <span class="theme-preview" style="background: #1976d2;"></span>
+            Test Professional Theme
+        </button>
+    </div>
+
+    <div class="test-container">
+        <h2>Automated Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Theme Persistence Test</h2>
+        <div class="test-section">
+            <h3>Storage Test</h3>
+            <div id="storageTestResults"></div>
+            <button class="test-button" onclick="runStorageTests()">Run Storage Tests</button>
+        </div>
+        <div class="test-section">
+            <h3>Session Persistence Test</h3>
+            <div id="sessionTestResults"></div>
+            <button class="test-button" onclick="testSessionPersistence()">Test Session Persistence</button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Theme Selector UI Responsiveness Test</h2>
+        <div class="test-section">
+            <h3>Screen Size Simulation</h3>
+            <div id="responsiveTestResults"></div>
+            <button class="test-button" onclick="testResponsiveUI()">Test Responsive UI</button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Log</h2>
+        <div class="test-log" id="testLog"></div>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <!-- Load the main application files -->
+    <script src="theme-manager.js"></script>
+    
+    <script>
+        // Test framework
+        class ThemeTestSuite {
+            constructor() {
+                this.testResults = [];
+                this.themeManager = null;
+                this.logElement = document.getElementById('testLog');
+                this.init();
+            }
+
+            init() {
+                this.log('Initializing Theme Test Suite...');
+                
+                // Wait for theme manager to be available
+                if (typeof ThemeManager !== 'undefined') {
+                    this.themeManager = new ThemeManager();
+                    this.runAllTests();
+                } else {
+                    this.log('ERROR: ThemeManager not found');
+                    this.displayError('ThemeManager class not found. Make sure theme-manager.js is loaded.');
+                }
+            }
+
+            log(message) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[${timestamp}] ${message}`;
+                console.log(logMessage);
+                
+                if (this.logElement) {
+                    this.logElement.innerHTML += logMessage + '\n';
+                    this.logElement.scrollTop = this.logElement.scrollHeight;
+                }
+            }
+
+            displayError(message) {
+                const container = document.getElementById('testResults');
+                container.innerHTML = `<div class="test-fail">ERROR: ${message}</div>`;
+            }
+
+            async runAllTests() {
+                this.log('Starting automated theme tests...');
+                
+                try {
+                    // Initialize theme system
+                    await this.testThemeSystemInitialization();
+                    
+                    // Test all five themes
+                    await this.testAllThemes();
+                    
+                    // Test theme persistence
+                    await this.testThemePersistence();
+                    
+                    // Test invalid theme handling
+                    await this.testInvalidThemeHandling();
+                    
+                    // Update displays
+                    this.updateCurrentThemeDisplay();
+                    this.displayTestSummary();
+                    
+                    this.log('All automated tests completed');
+                    
+                } catch (error) {
+                    this.log(`ERROR during test execution: ${error.message}`);
+                    this.displayError(`Test execution failed: ${error.message}`);
+                }
+            }
+
+            async testThemeSystemInitialization() {
+                this.log('Testing theme system initialization...');
+                
+                try {
+                    const initResult = this.themeManager.initializeThemeSystem();
+                    
+                    if (initResult) {
+                        this.addTestResult('Theme System Initialization', true, 'Theme system initialized successfully');
+                        this.log('✓ Theme system initialization: PASS');
+                    } else {
+                        this.addTestResult('Theme System Initialization', false, 'Theme system failed to initialize');
+                        this.log('✗ Theme system initialization: FAIL');
+                    }
+                } catch (error) {
+                    this.addTestResult('Theme System Initialization', false, `Initialization error: ${error.message}`);
+                    this.log(`✗ Theme system initialization error: ${error.message}`);
+                }
+            }
+
+            async testAllThemes() {
+                this.log('Testing all five themes...');
+                
+                const themes = ['white', 'dark', 'student', 'developer', 'professional'];
+                
+                for (const theme of themes) {
+                    await this.testSingleTheme(theme);
+                    // Small delay to allow theme transitions
+                    await this.delay(100);
+                }
+            }
+
+            async testSingleTheme(themeName) {
+                this.log(`Testing ${themeName} theme...`);
+                
+                try {
+                    // Test theme application
+                    const setResult = this.themeManager.setTheme(themeName);
+                    
+                    if (!setResult) {
+                        this.addTestResult(`${themeName} Theme Application`, false, 'setTheme returned false');
+                        this.log(`✗ ${themeName} theme application: FAIL`);
+                        return;
+                    }
+                    
+                    // Verify theme was applied
+                    const currentTheme = this.themeManager.getCurrentTheme();
+                    if (currentTheme !== themeName) {
+                        this.addTestResult(`${themeName} Theme Application`, false, `Expected ${themeName}, got ${currentTheme}`);
+                        this.log(`✗ ${themeName} theme verification: FAIL`);
+                        return;
+                    }
+                    
+                    // Check DOM attribute
+                    const documentElement = document.documentElement;
+                    const expectedAttribute = themeName === 'white' ? null : themeName;
+                    const actualAttribute = documentElement.getAttribute('data-theme');
+                    
+                    if (actualAttribute !== expectedAttribute) {
+                        this.addTestResult(`${themeName} Theme DOM`, false, `DOM attribute mismatch: expected ${expectedAttribute}, got ${actualAttribute}`);
+                        this.log(`✗ ${themeName} theme DOM: FAIL`);
+                        return;
+                    }
+                    
+                    // Test theme configuration
+                    const themeConfig = this.themeManager.getCurrentThemeConfig();
+                    if (!themeConfig || themeConfig.name !== themeName) {
+                        this.addTestResult(`${themeName} Theme Config`, false, 'Theme configuration not found or incorrect');
+                        this.log(`✗ ${themeName} theme config: FAIL`);
+                        return;
+                    }
+                    
+                    this.addTestResult(`${themeName} Theme Application`, true, 'Theme applied and verified successfully');
+                    this.log(`✓ ${themeName} theme: PASS`);
+                    
+                } catch (error) {
+                    this.addTestResult(`${themeName} Theme Application`, false, `Error: ${error.message}`);
+                    this.log(`✗ ${themeName} theme error: ${error.message}`);
+                }
+            }
+
+            async testThemePersistence() {
+                this.log('Testing theme persistence...');
+                
+                try {
+                    // Test saving theme preference
+                    const testTheme = 'dark';
+                    const saveResult = this.themeManager.saveThemePreference(testTheme);
+                    
+                    if (!saveResult) {
+                        this.addTestResult('Theme Persistence - Save', false, 'saveThemePreference returned false');
+                        this.log('✗ Theme persistence save: FAIL');
+                        return;
+                    }
+                    
+                    // Test loading theme preference
+                    const loadedTheme = this.themeManager.loadThemePreference();
+                    
+                    if (loadedTheme !== testTheme) {
+                        this.addTestResult('Theme Persistence - Load', false, `Expected ${testTheme}, got ${loadedTheme}`);
+                        this.log('✗ Theme persistence load: FAIL');
+                        return;
+                    }
+                    
+                    // Test localStorage directly
+                    const storageValue = localStorage.getItem('taskDashboardTheme');
+                    if (storageValue !== testTheme) {
+                        this.addTestResult('Theme Persistence - Storage', false, `localStorage value incorrect: ${storageValue}`);
+                        this.log('✗ Theme persistence storage: FAIL');
+                        return;
+                    }
+                    
+                    this.addTestResult('Theme Persistence', true, 'Theme persistence working correctly');
+                    this.log('✓ Theme persistence: PASS');
+                    
+                } catch (error) {
+                    this.addTestResult('Theme Persistence', false, `Error: ${error.message}`);
+                    this.log(`✗ Theme persistence error: ${error.message}`);
+                }
+            }
+
+            async testInvalidThemeHandling() {
+                this.log('Testing invalid theme handling...');
+                
+                try {
+                    const originalTheme = this.themeManager.getCurrentTheme();
+                    
+                    // Test invalid theme name
+                    const result = this.themeManager.setTheme('invalid-theme');
+                    
+                    // Should return true (fallback to default) or false
+                    const currentTheme = this.themeManager.getCurrentTheme();
+                    
+                    // Should fallback to default theme
+                    if (currentTheme === 'white' || currentTheme === originalTheme) {
+                        this.addTestResult('Invalid Theme Handling', true, 'Invalid theme handled correctly with fallback');
+                        this.log('✓ Invalid theme handling: PASS');
+                    } else {
+                        this.addTestResult('Invalid Theme Handling', false, `Unexpected theme after invalid input: ${currentTheme}`);
+                        this.log('✗ Invalid theme handling: FAIL');
+                    }
+                    
+                } catch (error) {
+                    this.addTestResult('Invalid Theme Handling', false, `Error: ${error.message}`);
+                    this.log(`✗ Invalid theme handling error: ${error.message}`);
+                }
+            }
+
+            addTestResult(testName, passed, details) {
+                this.testResults.push({
+                    name: testName,
+                    passed: passed,
+                    details: details,
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            }
+
+            displayTestSummary() {
+                const totalTests = this.testResults.length;
+                const passedTests = this.testResults.filter(test => test.passed).length;
+                const failedTests = totalTests - passedTests;
+                
+                const summaryElement = document.getElementById('testSummary');
+                const resultsElement = document.getElementById('testResults');
+                
+                // Summary
+                let summaryClass = 'test-info';
+                if (failedTests === 0) {
+                    summaryClass = 'test-pass';
+                } else if (passedTests === 0) {
+                    summaryClass = 'test-fail';
+                }
+                
+                summaryElement.innerHTML = `
+                    <div class="${summaryClass}">
+                        <strong>Test Summary:</strong> ${passedTests}/${totalTests} tests passed
+                        ${failedTests > 0 ? `(${failedTests} failed)` : ''}
+                    </div>
+                `;
+                
+                // Detailed results
+                let resultsHTML = '';
+                this.testResults.forEach(test => {
+                    const resultClass = test.passed ? 'test-pass' : 'test-fail';
+                    const status = test.passed ? '✓ PASS' : '✗ FAIL';
+                    
+                    resultsHTML += `
+                        <div class="${resultClass}">
+                            <strong>${test.name}</strong> - ${status}
+                            <br><small>${test.details} (${test.timestamp})</small>
+                        </div>
+                    `;
+                });
+                
+                resultsElement.innerHTML = resultsHTML;
+            }
+
+            updateCurrentThemeDisplay() {
+                if (!this.themeManager) return;
+                
+                const currentTheme = this.themeManager.getCurrentTheme();
+                const themeConfig = this.themeManager.getCurrentThemeConfig();
+                
+                const displayElement = document.getElementById('currentThemeDisplay');
+                const detailsElement = document.getElementById('themeDetails');
+                
+                displayElement.innerHTML = `Current Theme: <span style="color: #007bff;">${currentTheme}</span>`;
+                
+                if (themeConfig) {
+                    detailsElement.innerHTML = `
+                        <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                            <strong>Theme Details:</strong><br>
+                            Display Name: ${themeConfig.displayName}<br>
+                            Description: ${themeConfig.description}<br>
+                            CSS Class: ${themeConfig.cssClass}
+                        </div>
+                    `;
+                }
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Manual test functions
+        async function testTheme(themeName) {
+            if (window.testSuite && window.testSuite.themeManager) {
+                const success = window.testSuite.themeManager.setTheme(themeName);
+                window.testSuite.log(`Manual test: ${themeName} theme - ${success ? 'SUCCESS' : 'FAILED'}`);
+                window.testSuite.updateCurrentThemeDisplay();
+            }
+        }
+
+        function runStorageTests() {
+            const resultsElement = document.getElementById('storageTestResults');
+            let results = '';
+            
+            try {
+                // Test localStorage availability
+                const isAvailable = window.testSuite.themeManager.isStorageAvailable();
+                results += `<div class="${isAvailable ? 'test-pass' : 'test-fail'}">
+                    localStorage Available: ${isAvailable ? 'YES' : 'NO'}
+                </div>`;
+                
+                if (isAvailable) {
+                    // Test save/load cycle
+                    const testTheme = 'professional';
+                    const saveResult = window.testSuite.themeManager.saveThemePreference(testTheme);
+                    const loadResult = window.testSuite.themeManager.loadThemePreference();
+                    
+                    results += `<div class="${saveResult ? 'test-pass' : 'test-fail'}">
+                        Save Test: ${saveResult ? 'PASS' : 'FAIL'}
+                    </div>`;
+                    
+                    results += `<div class="${loadResult === testTheme ? 'test-pass' : 'test-fail'}">
+                        Load Test: ${loadResult === testTheme ? 'PASS' : 'FAIL'} (got: ${loadResult})
+                    </div>`;
+                }
+                
+            } catch (error) {
+                results += `<div class="test-fail">Storage Test Error: ${error.message}</div>`;
+            }
+            
+            resultsElement.innerHTML = results;
+        }
+
+        function testSessionPersistence() {
+            const resultsElement = document.getElementById('sessionTestResults');
+            
+            resultsElement.innerHTML = `
+                <div class="test-info">
+                    <strong>Session Persistence Test Instructions:</strong><br>
+                    1. Select a theme using the manual test buttons above<br>
+                    2. Refresh this page (F5 or Ctrl+R)<br>
+                    3. Check if the same theme is still active<br>
+                    4. The theme should persist across page reloads
+                </div>
+                <div class="test-info" style="margin-top: 10px;">
+                    <strong>Current Theme:</strong> ${window.testSuite ? window.testSuite.themeManager.getCurrentTheme() : 'Unknown'}
+                </div>
+            `;
+        }
+
+        function testResponsiveUI() {
+            const resultsElement = document.getElementById('responsiveTestResults');
+            let results = '';
+            
+            // Test different viewport sizes
+            const viewports = [
+                { name: 'Mobile', width: 375, height: 667 },
+                { name: 'Tablet', width: 768, height: 1024 },
+                { name: 'Desktop', width: 1200, height: 800 }
+            ];
+            
+            results += '<div class="test-info"><strong>Responsive UI Test Results:</strong></div>';
+            
+            viewports.forEach(viewport => {
+                // Simulate viewport change (note: this is limited in a test environment)
+                const mediaQuery = window.matchMedia(`(max-width: ${viewport.width}px)`);
+                const matches = mediaQuery.matches;
+                
+                results += `<div class="test-info">
+                    ${viewport.name} (${viewport.width}x${viewport.height}): 
+                    ${matches ? 'Active' : 'Not Active'} viewport
+                </div>`;
+            });
+            
+            results += `
+                <div class="test-info" style="margin-top: 10px;">
+                    <strong>Current Viewport:</strong> ${window.innerWidth}x${window.innerHeight}<br>
+                    <strong>Note:</strong> For complete responsive testing, manually resize the browser window 
+                    and verify the theme selector adapts correctly at different screen sizes.
+                </div>
+            `;
+            
+            resultsElement.innerHTML = results;
+        }
+
+        function clearLog() {
+            const logElement = document.getElementById('testLog');
+            if (logElement) {
+                logElement.innerHTML = '';
+            }
+        }
+
+        // Initialize test suite when page loads
+        window.addEventListener('load', () => {
+            window.testSuite = new ThemeTestSuite();
+        });
+    </script>
+</body>
+</html>

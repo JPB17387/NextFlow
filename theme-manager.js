@@ -7,6 +7,19 @@ class ThemeManager {
         this.DEFAULT_THEME = 'white';
         this.currentTheme = this.DEFAULT_THEME;
         
+        // Performance monitoring
+        this._performanceMetrics = {
+            themeChanges: 0,
+            averageChangeTime: 0,
+            lastChangeTime: 0,
+            memoryUsage: 0
+        };
+        
+        // Cleanup tracking
+        this._eventListeners = [];
+        this._timeouts = [];
+        this._themeChangeTimeout = null;
+        
         // Available themes configuration
         this.themes = {
             white: {
@@ -68,6 +81,10 @@ class ThemeManager {
         
         this.initialized = false;
         this.errorCallbacks = [];
+        
+        // Performance optimization: bind methods once to avoid repeated function creation
+        this._boundHandleVisibilityChange = this._handleVisibilityChange.bind(this);
+        this._boundHandleMemoryPressure = this._handleMemoryPressure.bind(this);
     }
 
     /**
@@ -80,9 +97,11 @@ class ThemeManager {
             console.log('Starting theme system initialization...');
             
             // Check if CSS custom properties are supported
-            if (!this.isCSSCustomPropertiesSupported()) {
-                this.handleError('CSS custom properties not supported', 'BROWSER_COMPATIBILITY');
-                return false;
+            const cssSupported = this.isCSSCustomPropertiesSupported();
+            if (!cssSupported) {
+                console.warn('CSS custom properties not supported, applying fallback styling');
+                this.handleError('Your browser does not support modern theme features. Using basic styling.', 'BROWSER_COMPATIBILITY');
+                // Continue with initialization but in fallback mode
             }
 
             // Check localStorage availability (Requirement 8.4)
@@ -114,12 +133,19 @@ class ThemeManager {
             
             this.initialized = true;
             
+            // Setup performance monitoring
+            this._setupPerformanceMonitoring();
+            
+            // Initialize performance metrics
+            this._performanceMetrics.lastChangeTime = performance.now();
+            
             // Log initialization success with status
             console.log('Theme system initialized successfully', {
                 currentTheme: this.currentTheme,
                 storageAvailable: storageAvailable,
                 hadSavedPreference: !!savedTheme,
-                cssSupported: true
+                cssSupported: true,
+                performanceMonitoring: true
             });
             
             return true;
@@ -148,26 +174,63 @@ class ThemeManager {
      */
     setTheme(themeName, skipTransition = false) {
         try {
-            // Validate theme name
+            // Performance optimization: early return if theme is already active
+            if (this.currentTheme === themeName && this.initialized) {
+                console.log(`Theme '${themeName}' is already active, skipping change`);
+                return true;
+            }
+
+            // Validate theme name with comprehensive checking
             if (!this.isValidTheme(themeName)) {
-                this.handleError(`Invalid theme name: ${themeName}`, 'INVALID_THEME');
+                console.warn(`Invalid theme name provided: ${themeName}`);
+                this.handleError(`Invalid theme name: ${themeName}. Available themes: ${Object.keys(this.themes).join(', ')}`, 'INVALID_THEME');
+                
                 // Fallback to default theme
+                const originalTheme = themeName;
                 themeName = this.DEFAULT_THEME;
+                
+                // Log the fallback for debugging
+                console.log(`Falling back from invalid theme '${originalTheme}' to default theme '${themeName}'`);
+                
+                // Verify default theme is valid (safety check)
+                if (!this.isValidTheme(themeName)) {
+                    console.error(`Even default theme '${themeName}' is invalid! Theme system is corrupted.`);
+                    this.handleError('Theme system is corrupted - default theme is invalid', 'SYSTEM_CORRUPTION');
+                    return false;
+                }
+            }
+
+            // Performance optimization: debounce rapid theme changes
+            if (this._themeChangeTimeout) {
+                clearTimeout(this._themeChangeTimeout);
             }
 
             // Store previous theme for rollback if needed
             const previousTheme = this.currentTheme;
 
-            // Preserve form state during theme transition (requirement 7.3)
+            // Performance optimization: only preserve form state if there are form elements
             let formState = {};
-            if (!skipTransition) {
+            if (!skipTransition && document.querySelector('input, select, textarea')) {
                 formState = this.preserveFormState();
             }
 
-            // Apply theme to DOM
+            // Apply theme to DOM with comprehensive error handling
             const applySuccess = this.applyThemeToDOM(themeName, skipTransition);
             if (!applySuccess) {
-                this.handleError('Failed to apply theme to DOM', 'DOM_APPLICATION_ERROR');
+                console.error(`Failed to apply theme '${themeName}' to DOM`);
+                this.handleError(`Failed to apply theme '${themeName}'. Attempting recovery.`, 'DOM_APPLICATION_ERROR');
+                
+                // Try to recover by applying default theme
+                if (themeName !== this.DEFAULT_THEME) {
+                    console.log('Attempting to recover by applying default theme...');
+                    const defaultApplySuccess = this.applyThemeToDOM(this.DEFAULT_THEME, true);
+                    if (defaultApplySuccess) {
+                        this.currentTheme = this.DEFAULT_THEME;
+                        console.log('Successfully recovered with default theme');
+                        return true;
+                    }
+                }
+                
                 return false;
             }
 
@@ -182,14 +245,19 @@ class ThemeManager {
             // Update current theme
             this.currentTheme = themeName;
 
-            // Save theme preference (only if not initial load)
+            // Performance optimization: debounce storage operations
             if (!skipTransition) {
-                const saveSuccess = this.saveThemePreference(themeName);
-                if (!saveSuccess) {
-                    // Theme is applied but not saved - warn user
-                    this.handleError('Theme applied but could not be saved', 'STORAGE_WARNING');
-                }
+                this._themeChangeTimeout = setTimeout(() => {
+                    const saveSuccess = this.saveThemePreference(themeName);
+                    if (!saveSuccess) {
+                        // Theme is applied but not saved - warn user
+                        this.handleError('Theme applied but could not be saved', 'STORAGE_WARNING');
+                    }
+                }, 100); // 100ms debounce
             }
+
+            // Performance monitoring: track theme change metrics
+            this._trackThemeChangePerformance(themeName, previousTheme);
 
             // Dispatch theme change event
             this.dispatchThemeChangeEvent(themeName, previousTheme);
@@ -355,25 +423,34 @@ class ThemeManager {
                 return false;
             }
 
+            // Performance optimization: batch DOM operations
+            const operations = [];
+
             // Prevent layout shifts during theme change (requirement 7.4)
             const layoutState = this.preserveLayoutState();
 
             // Temporarily disable transitions if requested (for initial load)
             if (skipTransition) {
-                documentElement.classList.add('theme-transition-disabled');
+                operations.push(() => documentElement.classList.add('theme-transition-disabled'));
             }
 
-            // Remove existing theme attributes
-            Object.keys(this.themes).forEach(theme => {
-                documentElement.removeAttribute(`data-theme-${theme}`);
-            });
-
-            // Apply new theme
+            // Performance optimization: only remove/set attributes if they're different
+            const currentTheme = documentElement.getAttribute('data-theme');
+            
             if (themeName === 'white') {
                 // White theme is the default, no data-theme attribute needed
-                documentElement.removeAttribute('data-theme');
+                if (currentTheme !== null) {
+                    operations.push(() => documentElement.removeAttribute('data-theme'));
+                }
             } else {
-                documentElement.setAttribute('data-theme', themeName);
+                if (currentTheme !== themeName) {
+                    operations.push(() => documentElement.setAttribute('data-theme', themeName));
+                }
+            }
+
+            // Execute all DOM operations in a single batch to minimize reflows
+            if (operations.length > 0) {
+                operations.forEach(operation => operation());
             }
 
             // Check for layout shifts and restore if necessary
@@ -484,24 +561,64 @@ class ThemeManager {
     }
 
     /**
-     * Check if localStorage is available
+     * Check if localStorage is available with comprehensive detection
      * @returns {boolean} - Availability status
      */
     isStorageAvailable() {
         try {
-            if (typeof localStorage === 'undefined') {
+            // Cache the result to avoid repeated expensive checks
+            if (this._storageAvailable !== undefined) {
+                return this._storageAvailable;
+            }
+
+            // Check if localStorage exists
+            if (typeof localStorage === 'undefined' || localStorage === null) {
+                this._storageAvailable = false;
                 return false;
             }
 
-            // Test localStorage functionality
+            // Test localStorage functionality with comprehensive checks
             const test = '__theme_storage_test__';
-            localStorage.setItem(test, test);
+            const testValue = 'test_value_' + Date.now();
+            
+            // Test setItem
+            localStorage.setItem(test, testValue);
+            
+            // Test getItem
             const retrieved = localStorage.getItem(test);
+            
+            // Test removeItem
             localStorage.removeItem(test);
-
-            return retrieved === test;
+            
+            // Verify the test worked correctly
+            const isWorking = retrieved === testValue;
+            
+            // Additional test: check if removeItem actually worked
+            const shouldBeNull = localStorage.getItem(test);
+            const removeWorked = shouldBeNull === null;
+            
+            const isAvailable = isWorking && removeWorked;
+            this._storageAvailable = isAvailable;
+            
+            if (!isAvailable) {
+                console.warn('localStorage functionality test failed');
+            }
+            
+            return isAvailable;
 
         } catch (error) {
+            // Handle specific error types for better diagnostics
+            if (error.name === 'SecurityError') {
+                console.warn('localStorage access denied (private browsing mode?):', error);
+                this.handleError('Storage access denied - likely private browsing mode', 'STORAGE_ACCESS_DENIED');
+            } else if (error.name === 'QuotaExceededError') {
+                console.warn('localStorage quota exceeded during availability test:', error);
+                this.handleError('Storage quota exceeded during test', 'STORAGE_QUOTA_EXCEEDED');
+            } else {
+                console.warn('localStorage availability test failed:', error);
+            }
+            
+            this._storageAvailable = false;
             return false;
         }
     }
@@ -512,44 +629,71 @@ class ThemeManager {
      */
     isCSSCustomPropertiesSupported() {
         try {
+            // Cache the result to avoid repeated expensive checks
+            if (this._cssSupported !== undefined) {
+                return this._cssSupported;
+            }
+
             // Primary check: CSS.supports API
             if (window.CSS && CSS.supports && CSS.supports('color', 'var(--test)')) {
+                this._cssSupported = true;
                 return true;
             }
 
-            // Fallback check: Create test element and check computed style
-            const testElement = document.createElement('div');
-            testElement.style.setProperty('--test-var', 'test-value');
-            testElement.style.color = 'var(--test-var)';
+            // Secondary check: Test actual CSS variable functionality
+            if (document.body) {
+                const testElement = document.createElement('div');
+                testElement.style.setProperty('--test-var', 'rgb(255, 0, 0)');
+                testElement.style.color = 'var(--test-var, blue)';
+                
+                // Temporarily add to DOM for accurate computation
+                testElement.style.position = 'absolute';
+                testElement.style.visibility = 'hidden';
+                testElement.style.pointerEvents = 'none';
+                testElement.style.top = '-9999px';
+                testElement.style.left = '-9999px';
+                
+                document.body.appendChild(testElement);
+                
+                const computedStyle = window.getComputedStyle(testElement);
+                const computedColor = computedStyle.color;
+                
+                // Clean up
+                document.body.removeChild(testElement);
+                
+                // Check if the CSS variable was applied (red color)
+                const supportsCustomProps = computedColor === 'rgb(255, 0, 0)' || 
+                                          computedColor === 'red' ||
+                                          computedStyle.getPropertyValue('--test-var').trim() === 'rgb(255, 0, 0)';
+                
+                this._cssSupported = supportsCustomProps;
+                return supportsCustomProps;
+            }
+
+            // Tertiary check: User agent detection for known incompatible browsers
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isOldIE = userAgent.indexOf('msie') !== -1 || userAgent.indexOf('trident') !== -1;
+            const isOldEdge = userAgent.indexOf('edge/') !== -1 && userAgent.indexOf('edg/') === -1;
+            const isOldChrome = /chrome\/([0-9]+)/.test(userAgent) && parseInt(RegExp.$1) < 49;
+            const isOldFirefox = /firefox\/([0-9]+)/.test(userAgent) && parseInt(RegExp.$1) < 31;
+            const isOldSafari = /version\/([0-9]+).*safari/.test(userAgent) && parseInt(RegExp.$1) < 9;
             
-            // Temporarily add to DOM for accurate computation
-            testElement.style.position = 'absolute';
-            testElement.style.visibility = 'hidden';
-            testElement.style.pointerEvents = 'none';
-            document.body.appendChild(testElement);
+            if (isOldIE || isOldEdge || isOldChrome || isOldFirefox || isOldSafari) {
+                this._cssSupported = false;
+                return false;
+            }
             
-            const computedStyle = window.getComputedStyle(testElement);
-            const supportsCustomProps = computedStyle.getPropertyValue('--test-var') === 'test-value';
-            
-            // Clean up
-            document.body.removeChild(testElement);
-            
-            return supportsCustomProps;
+            // Assume support for modern browsers if all detection methods fail
+            console.warn('CSS custom properties support could not be determined, assuming support');
+            this._cssSupported = true;
+            return true;
 
         } catch (error) {
             console.warn('CSS custom properties support detection failed:', error);
             
-            // Ultra-conservative fallback: check user agent for known incompatible browsers
-            const userAgent = navigator.userAgent.toLowerCase();
-            const isOldIE = userAgent.indexOf('msie') !== -1 || userAgent.indexOf('trident') !== -1;
-            const isOldEdge = userAgent.indexOf('edge/') !== -1 && !userAgent.indexOf('edg/') !== -1;
-            
-            if (isOldIE || isOldEdge) {
-                return false;
-            }
-            
-            // Assume support for modern browsers if detection fails
-            return true;
+            // Conservative fallback: assume no support if detection fails
+            this._cssSupported = false;
+            return false;
         }
     }
 
@@ -716,9 +860,17 @@ class ThemeManager {
                 this.showUserError('Theme preference could not be saved due to storage error.', false);
                 break;
                 
+            case 'SYSTEM_CORRUPTION':
+                this.showUserError('Theme system is corrupted. Please refresh the page.', true);
+                this.performSystemRecovery();
+                break;
+                
             default:
                 // Log generic errors but don't show to users to avoid confusion
-                console.warn(`Unhandled theme error type: ${type}`);
+                console.warn(`Unhandled theme error type: ${type}. Message: ${message}`);
+                if (originalError) {
+                    console.error('Original error:', originalError);
+                }
                 break;
         }
     }
@@ -728,31 +880,145 @@ class ThemeManager {
      */
     applyFallbackStyling() {
         try {
+            console.log('Applying fallback styling for browser compatibility...');
+            
             // Add a class to indicate fallback mode
             document.documentElement.classList.add('theme-fallback-mode');
             
-            // Apply basic styling via inline styles as last resort
+            // Remove any existing theme attributes that won't work
+            document.documentElement.removeAttribute('data-theme');
+            Object.keys(this.themes).forEach(theme => {
+                document.documentElement.removeAttribute(`data-theme-${theme}`);
+            });
+            
+            // Apply comprehensive fallback styling via inline styles
             const fallbackStyles = `
-                body { background: #ffffff; color: #1a202c; }
-                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-                .task-item { background: #f7fafc; border: 1px solid #e2e8f0; }
-                .btn-primary { background: #667eea; color: white; }
-                .btn-secondary { background: #e2e8f0; color: #4a5568; }
+                /* Fallback Theme Styles - Applied when CSS custom properties are not supported */
+                .theme-fallback-mode {
+                    /* Base colors */
+                    background: #ffffff;
+                    color: #1a202c;
+                }
+                
+                .theme-fallback-mode body {
+                    background: #ffffff;
+                    color: #1a202c;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                }
+                
+                .theme-fallback-mode .header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                }
+                
+                .theme-fallback-mode .task-item {
+                    background: #f7fafc;
+                    border: 1px solid #e2e8f0;
+                    color: #1a202c;
+                }
+                
+                .theme-fallback-mode .task-item.completed {
+                    background: #e6fffa;
+                    opacity: 0.7;
+                }
+                
+                .theme-fallback-mode .btn-primary {
+                    background: #667eea;
+                    color: white;
+                    border: none;
+                }
+                
+                .theme-fallback-mode .btn-secondary {
+                    background: #e2e8f0;
+                    color: #4a5568;
+                    border: 1px solid #cbd5e0;
+                }
+                
+                .theme-fallback-mode .form-input {
+                    background: #ffffff;
+                    border: 1px solid #e2e8f0;
+                    color: #1a202c;
+                }
+                
+                .theme-fallback-mode .form-select {
+                    background: #ffffff;
+                    border: 1px solid #e2e8f0;
+                    color: #1a202c;
+                }
+                
+                .theme-fallback-mode .progress-bar {
+                    background: #e2e8f0;
+                }
+                
+                .theme-fallback-mode .progress-fill {
+                    background: #667eea;
+                }
+                
+                .theme-fallback-mode .category-work {
+                    background: #3182ce;
+                    color: white;
+                }
+                
+                .theme-fallback-mode .category-study {
+                    background: #38a169;
+                    color: white;
+                }
+                
+                .theme-fallback-mode .category-personal {
+                    background: #ed8936;
+                    color: white;
+                }
+                
+                .theme-fallback-mode .storage-warning,
+                .theme-fallback-mode .theme-error-message {
+                    background: #fed7d7;
+                    color: #c53030;
+                    border: 1px solid #feb2b2;
+                }
+                
+                /* Disable transitions in fallback mode */
+                .theme-fallback-mode * {
+                    transition: none !important;
+                    animation: none !important;
+                }
             `;
             
             let styleElement = document.getElementById('theme-fallback-styles');
             if (!styleElement) {
                 styleElement = document.createElement('style');
                 styleElement.id = 'theme-fallback-styles';
-                document.head.appendChild(styleElement);
+                styleElement.type = 'text/css';
+                
+                // Try to add to head, fallback to body if head doesn't exist
+                const targetElement = document.head || document.body || document.documentElement;
+                if (targetElement) {
+                    targetElement.appendChild(styleElement);
+                } else {
+                    console.error('Could not find element to append fallback styles');
+                    return false;
+                }
             }
             
             styleElement.textContent = fallbackStyles;
             
-            console.log('Applied fallback styling for unsupported browser');
+            console.log('Applied comprehensive fallback styling for unsupported browser');
+            return true;
             
         } catch (error) {
             console.error('Failed to apply fallback styling:', error);
+            
+            // Ultimate fallback: try to set basic inline styles on body
+            try {
+                if (document.body) {
+                    document.body.style.background = '#ffffff';
+                    document.body.style.color = '#1a202c';
+                    console.log('Applied emergency inline styles');
+                }
+                return false;
+            } catch (inlineError) {
+                console.error('Even emergency inline styles failed:', inlineError);
+                return false;
+            }
         }
     }
 
@@ -774,23 +1040,35 @@ class ThemeManager {
             
             // If current theme fails, try default theme
             console.log('Current theme recovery failed, trying default theme...');
-            const defaultRecovery = this.applyThemeToDOM(this.DEFAULT_THEME, true);
+            const defaultRecoverySuccess = this.applyThemeToDOM(this.DEFAULT_THEME, true);
             
-            if (defaultRecovery) {
+            if (defaultRecoverySuccess) {
                 this.currentTheme = this.DEFAULT_THEME;
                 console.log('Default theme recovery successful');
+                this.showUserError('Theme was reset to default due to an error.', false);
                 return true;
             }
             
-            // If all else fails, apply fallback styling
-            console.log('All theme recovery attempts failed, applying fallback styling');
+            // If even default theme fails, apply fallback styling
+            console.log('Default theme recovery failed, applying fallback styling...');
             this.applyFallbackStyling();
+            this.currentTheme = this.DEFAULT_THEME;
+            this.showUserError('Theme system encountered an error. Using basic styling.', true);
             return false;
             
         } catch (error) {
             console.error('Theme recovery attempt failed:', error);
-            this.applyFallbackStyling();
-            return false;
+            
+            // Last resort: apply emergency fallback
+            try {
+                this.applyFallbackStyling();
+                this.currentTheme = this.DEFAULT_THEME;
+                console.log('Emergency fallback applied');
+                return false;
+            } catch (fallbackError) {
+                console.error('Even emergency fallback failed:', fallbackError);
+                return false;
+            }
         }
     }
 
@@ -803,9 +1081,24 @@ class ThemeManager {
         try {
             // Try to use existing error display system if available
             if (typeof showStorageWarning === 'function') {
-                showStorageWarning(message, persistent);
+                console.log('Using existing showStorageWarning function for theme error');
+                showStorageWarning(`Theme: ${message}`, persistent);
                 return;
             }
+
+            // Check if we're in a browser environment
+            if (typeof document === 'undefined' || !document) {
+                console.error('Document not available for error display:', message);
+                return;
+            }
+
+            // Remove existing theme error messages to avoid duplicates
+            const existingErrors = document.querySelectorAll('.theme-error-message');
+            existingErrors.forEach(error => {
+                if (error.textContent.includes(message)) {
+                    error.remove();
+                }
+            });
 
             // Fallback: create enhanced error display with theme-aware styling
             const errorElement = document.createElement('div');
@@ -815,8 +1108,9 @@ class ThemeManager {
             
             // Create error content with icon
             const iconSpan = document.createElement('span');
-            iconSpan.textContent = '⚠';
+            iconSpan.textContent = '⚠️';
             iconSpan.style.cssText = 'margin-right: 8px; font-size: 1.1rem;';
+            iconSpan.setAttribute('aria-hidden', 'true');
             
             const messageSpan = document.createElement('span');
             messageSpan.textContent = message;
@@ -838,38 +1132,74 @@ class ThemeManager {
                     border: none;
                     color: inherit;
                     font-size: 1.2rem;
-                    margin-left: 8px;
+                    margin-left: auto;
+                    margin-right: 4px;
                     cursor: pointer;
-                    padding: 0;
+                    padding: 4px;
                     line-height: 1;
+                    border-radius: 2px;
                 `;
-                closeButton.setAttribute('aria-label', 'Close error message');
-                closeButton.onclick = () => errorElement.remove();
+                closeButton.setAttribute('aria-label', 'Close theme error message');
+                closeButton.setAttribute('type', 'button');
+                closeButton.onclick = () => {
+                    errorElement.remove();
+                    console.log('Theme error message dismissed by user');
+                };
+                
+                // Add hover effect
+                closeButton.onmouseover = () => {
+                    closeButton.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                };
+                closeButton.onmouseout = () => {
+                    closeButton.style.backgroundColor = 'transparent';
+                };
+                
                 errorElement.appendChild(closeButton);
             }
 
-            // Ensure body exists before appending
-            if (!document.body) {
-                console.error('Document body not available for error display');
-                return;
+            // Find the best place to insert the error message
+            let insertTarget = null;
+            
+            // Try to insert after header (like showStorageWarning does)
+            const header = document.querySelector('header');
+            if (header && header.parentNode) {
+                insertTarget = header.parentNode;
+                insertTarget.insertBefore(errorElement, header.nextSibling);
+            } else if (document.body) {
+                // Fallback: prepend to body
+                insertTarget = document.body;
+                insertTarget.insertBefore(errorElement, insertTarget.firstChild);
+            } else {
+                console.error('Could not find suitable element to display theme error');
+                // Last resort: try to append to document element
+                if (document.documentElement) {
+                    document.documentElement.appendChild(errorElement);
+                } else {
+                    throw new Error('No suitable parent element found');
+                }
             }
 
-            document.body.appendChild(errorElement);
+            console.log(`Theme error message displayed: ${message} (persistent: ${persistent})`);
 
             // Auto-remove after delay (longer for persistent messages)
-            const removeDelay = persistent ? 10000 : 5000;
+            const removeDelay = persistent ? 15000 : 6000;
             setTimeout(() => {
                 if (errorElement.parentNode) {
                     errorElement.remove();
+                    console.log('Theme error message auto-removed after timeout');
                 }
             }, removeDelay);
 
         } catch (error) {
             console.error('Error showing user error message:', error);
-            // Ultimate fallback: use alert if all else fails
+            
+            // Ultimate fallback: use console and alert
+            console.warn(`THEME ERROR (could not display UI): ${message}`);
+            
             try {
-                if (typeof alert === 'function') {
-                    alert(`Theme Error: ${message}`);
+                // Only use alert for critical errors to avoid annoying users
+                if (persistent && typeof alert === 'function') {
+                    alert(`Theme System Error: ${message}`);
                 }
             } catch (alertError) {
                 console.error('Even alert fallback failed:', alertError);
@@ -1205,14 +1535,340 @@ class ThemeManager {
             return recoveryReport;
         }
     }
-}
 
-// Create and export theme manager instance
-const themeManager = new ThemeManager();
+    /**
+     * Performance Monitoring and Optimization Methods
+     */
+
+    /**
+     * Track theme change performance metrics
+     * @param {string} newTheme - New theme name
+     * @param {string} previousTheme - Previous theme name
+     */
+    _trackThemeChangePerformance(newTheme, previousTheme) {
+        try {
+            const now = performance.now();
+            const changeTime = now - (this._performanceMetrics.lastChangeTime || now);
+            
+            this._performanceMetrics.themeChanges++;
+            this._performanceMetrics.lastChangeTime = now;
+            
+            // Calculate rolling average of change times
+            if (this._performanceMetrics.themeChanges === 1) {
+                this._performanceMetrics.averageChangeTime = changeTime;
+            } else {
+                this._performanceMetrics.averageChangeTime = 
+                    (this._performanceMetrics.averageChangeTime * 0.8) + (changeTime * 0.2);
+            }
+            
+            // Monitor memory usage if available
+            if (performance.memory) {
+                this._performanceMetrics.memoryUsage = performance.memory.usedJSHeapSize;
+            }
+            
+            // Log performance warnings if theme changes are slow
+            if (changeTime > 500) { // More than 500ms
+                console.warn(`Slow theme change detected: ${changeTime.toFixed(2)}ms`);
+            }
+            
+            // Log performance summary every 10 theme changes
+            if (this._performanceMetrics.themeChanges % 10 === 0) {
+                this._logPerformanceSummary();
+            }
+            
+        } catch (error) {
+            console.error('Error tracking theme performance:', error);
+        }
+    }
+
+    /**
+     * Log performance summary
+     */
+    _logPerformanceSummary() {
+        try {
+            const metrics = this._performanceMetrics;
+            console.log('Theme System Performance Summary:', {
+                totalChanges: metrics.themeChanges,
+                averageChangeTime: `${metrics.averageChangeTime.toFixed(2)}ms`,
+                memoryUsage: metrics.memoryUsage ? `${(metrics.memoryUsage / 1024 / 1024).toFixed(2)}MB` : 'N/A',
+                currentTheme: this.currentTheme
+            });
+        } catch (error) {
+            console.error('Error logging performance summary:', error);
+        }
+    }
+
+    /**
+     * Get current performance metrics
+     * @returns {Object} Performance metrics
+     */
+    getPerformanceMetrics() {
+        return {
+            ...this._performanceMetrics,
+            memoryUsageFormatted: this._performanceMetrics.memoryUsage ? 
+                `${(this._performanceMetrics.memoryUsage / 1024 / 1024).toFixed(2)}MB` : 'N/A'
+        };
+    }
+
+    /**
+     * Optimize theme system performance
+     */
+    optimizePerformance() {
+        try {
+            // Clear any pending timeouts
+            this._clearTimeouts();
+            
+            // Force garbage collection if available (development only)
+            if (window.gc && typeof window.gc === 'function') {
+                window.gc();
+                console.log('Forced garbage collection for theme system');
+            }
+            
+            // Clear cached DOM queries
+            this._clearDOMCache();
+            
+            // Reset performance metrics
+            this._performanceMetrics = {
+                themeChanges: 0,
+                averageChangeTime: 0,
+                lastChangeTime: 0,
+                memoryUsage: performance.memory ? performance.memory.usedJSHeapSize : 0
+            };
+            
+            console.log('Theme system performance optimized');
+            return true;
+            
+        } catch (error) {
+            console.error('Error optimizing theme performance:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Handle visibility change to optimize performance when tab is hidden
+     */
+    _handleVisibilityChange() {
+        try {
+            if (document.hidden) {
+                // Tab is hidden, reduce performance overhead
+                this._pausePerformanceMonitoring();
+            } else {
+                // Tab is visible, resume normal operation
+                this._resumePerformanceMonitoring();
+            }
+        } catch (error) {
+            console.error('Error handling visibility change:', error);
+        }
+    }
+
+    /**
+     * Handle memory pressure events
+     */
+    _handleMemoryPressure() {
+        try {
+            console.log('Memory pressure detected, optimizing theme system...');
+            this.optimizePerformance();
+        } catch (error) {
+            console.error('Error handling memory pressure:', error);
+        }
+    }
+
+    /**
+     * Pause performance monitoring when tab is hidden
+     */
+    _pausePerformanceMonitoring() {
+        this._performanceMonitoringPaused = true;
+    }
+
+    /**
+     * Resume performance monitoring when tab becomes visible
+     */
+    _resumePerformanceMonitoring() {
+        this._performanceMonitoringPaused = false;
+        this._performanceMetrics.lastChangeTime = performance.now();
+    }
+
+    /**
+     * Clear all timeouts to prevent memory leaks
+     */
+    _clearTimeouts() {
+        try {
+            if (this._themeChangeTimeout) {
+                clearTimeout(this._themeChangeTimeout);
+                this._themeChangeTimeout = null;
+            }
+            
+            this._timeouts.forEach(timeout => {
+                if (timeout) {
+                    clearTimeout(timeout);
+                }
+            });
+            this._timeouts = [];
+            
+        } catch (error) {
+            console.error('Error clearing timeouts:', error);
+        }
+    }
+
+    /**
+     * Clear DOM cache to free memory
+     */
+    _clearDOMCache() {
+        try {
+            // Clear any cached DOM references
+            this._cachedElements = null;
+            
+            // Clear cached storage availability
+            this._storageAvailable = undefined;
+            this._cssSupported = undefined;
+            
+        } catch (error) {
+            console.error('Error clearing DOM cache:', error);
+        }
+    }
+
+    /**
+     * Setup performance monitoring event listeners
+     */
+    _setupPerformanceMonitoring() {
+        try {
+            // Monitor page visibility changes
+            if (typeof document.addEventListener === 'function') {
+                document.addEventListener('visibilitychange', this._boundHandleVisibilityChange);
+                this._eventListeners.push({
+                    element: document,
+                    event: 'visibilitychange',
+                    handler: this._boundHandleVisibilityChange
+                });
+            }
+            
+            // Monitor memory pressure if supported
+            if ('memory' in performance && 'addEventListener' in window) {
+                window.addEventListener('memory-pressure', this._boundHandleMemoryPressure);
+                this._eventListeners.push({
+                    element: window,
+                    event: 'memory-pressure',
+                    handler: this._boundHandleMemoryPressure
+                });
+            }
+            
+        } catch (error) {
+            console.error('Error setting up performance monitoring:', error);
+        }
+    }
+
+    /**
+     * Cleanup all resources and event listeners
+     */
+    cleanup() {
+        try {
+            console.log('Cleaning up theme system resources...');
+            
+            // Clear all timeouts
+            this._clearTimeouts();
+            
+            // Remove all event listeners
+            this._eventListeners.forEach(({ element, event, handler }) => {
+                try {
+                    element.removeEventListener(event, handler);
+                } catch (error) {
+                    console.warn('Error removing event listener:', error);
+                }
+            });
+            this._eventListeners = [];
+            
+            // Clear DOM cache
+            this._clearDOMCache();
+            
+            // Clear error callbacks
+            this.errorCallbacks = [];
+            
+            // Reset state
+            this.initialized = false;
+            
+            console.log('Theme system cleanup completed');
+            return true;
+            
+        } catch (error) {
+            console.error('Error during theme system cleanup:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Test theme system performance
+     * @param {number} iterations - Number of test iterations
+     * @returns {Object} Performance test results
+     */
+    async testPerformance(iterations = 10) {
+        try {
+            console.log(`Starting theme system performance test with ${iterations} iterations...`);
+            
+            const themes = Object.keys(this.themes);
+            const results = {
+                totalTime: 0,
+                averageTime: 0,
+                minTime: Infinity,
+                maxTime: 0,
+                iterations: iterations,
+                errors: 0
+            };
+            
+            const originalTheme = this.currentTheme;
+            
+            for (let i = 0; i < iterations; i++) {
+                const testTheme = themes[i % themes.length];
+                const startTime = performance.now();
+                
+                try {
+                    await new Promise(resolve => {
+                        this.setTheme(testTheme);
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(resolve);
+                        });
+                    });
+                    
+                    const endTime = performance.now();
+                    const duration = endTime - startTime;
+                    
+                    results.totalTime += duration;
+                    results.minTime = Math.min(results.minTime, duration);
+                    results.maxTime = Math.max(results.maxTime, duration);
+                    
+                } catch (error) {
+                    results.errors++;
+                    console.error(`Performance test error on iteration ${i}:`, error);
+                }
+            }
+            
+            // Restore original theme
+            this.setTheme(originalTheme);
+            
+            results.averageTime = results.totalTime / iterations;
+            
+            console.log('Theme System Performance Test Results:', {
+                ...results,
+                totalTime: `${results.totalTime.toFixed(2)}ms`,
+                averageTime: `${results.averageTime.toFixed(2)}ms`,
+                minTime: `${results.minTime.toFixed(2)}ms`,
+                maxTime: `${results.maxTime.toFixed(2)}ms`
+            });
+            
+            return results;
+            
+        } catch (error) {
+            console.error('Error running performance test:', error);
+            return null;
+        }
+    }
+}
 
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = themeManager;
+    module.exports = ThemeManager;
 } else if (typeof window !== 'undefined') {
+    // Create and export theme manager instance for browser
+    const themeManager = new ThemeManager();
     window.themeManager = themeManager;
+    window.ThemeManager = ThemeManager;
 }

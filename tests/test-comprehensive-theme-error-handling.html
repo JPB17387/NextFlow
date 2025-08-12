@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Theme Error Handling Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .test-button {
+            margin: 5px;
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-results {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Theme Error Handling Test Suite</h1>
+        <p>Testing comprehensive error handling and fallbacks for the theme system</p>
+    </header>
+
+    <main>
+        <div class="test-section">
+            <h2>1. Invalid Theme Name Tests</h2>
+            <button class="test-button" onclick="testInvalidTheme()">Test Invalid Theme</button>
+            <button class="test-button" onclick="testNullTheme()">Test Null Theme</button>
+            <button class="test-button" onclick="testEmptyTheme()">Test Empty Theme</button>
+            <div id="invalid-theme-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. CSS Support Detection Tests</h2>
+            <button class="test-button" onclick="testCSSSupport()">Test CSS Support Detection</button>
+            <button class="test-button" onclick="simulateUnsupportedBrowser()">Simulate Unsupported Browser</button>
+            <div id="css-support-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Storage Error Tests</h2>
+            <button class="test-button" onclick="testStorageUnavailable()">Test Storage Unavailable</button>
+            <button class="test-button" onclick="testStorageQuotaExceeded()">Test Storage Quota</button>
+            <div id="storage-error-results" class="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. DOM Error Tests</h2>
+            <button class="test-button" onclick="testDOMErrors()">Test DOM Application Errors</button>
+            <button class="test-button" onclick="testMissingElements()">Test Missing Elements</button>
+            <div id="dom-error-results" class="test-results"></div>
+        </div>
+    </main>
+
+    <script src="theme-manager.js"></script>
+    <script src="script.js"></script>
+</invoke>    <scrip
+t>
+        // Test Functions for Comprehensive Error Handling
+
+        function testInvalidTheme() {
+            const results = document.getElementById('invalid-theme-results');
+            results.textContent = 'Testing invalid theme names...\n';
+            
+            console.log('=== Testing Invalid Theme Names ===');
+            
+            // Test 1: Invalid theme name
+            console.log('Test 1: Setting invalid theme "nonexistent"');
+            const result1 = themeManager.setTheme('nonexistent');
+            results.textContent += `Invalid theme "nonexistent": ${result1 ? 'PASS' : 'FAIL'}\n`;
+            
+            // Test 2: Check current theme after invalid attempt
+            const currentTheme = themeManager.getCurrentTheme();
+            results.textContent += `Current theme after invalid attempt: ${currentTheme}\n`;
+            
+            // Test 3: Verify fallback to default
+            const isDefault = currentTheme === themeManager.DEFAULT_THEME;
+            results.textContent += `Fallback to default: ${isDefault ? 'PASS' : 'FAIL'}\n`;
+        }
+
+        function testNullTheme() {
+            const results = document.getElementById('invalid-theme-results');
+            results.textContent += '\nTesting null/undefined themes...\n';
+            
+            console.log('=== Testing Null/Undefined Themes ===');
+            
+            // Test null theme
+            console.log('Test: Setting null theme');
+            const result1 = themeManager.setTheme(null);
+            results.textContent += `Null theme: ${result1 ? 'HANDLED' : 'REJECTED'}\n`;
+            
+            // Test undefined theme
+            console.log('Test: Setting undefined theme');
+            const result2 = themeManager.setTheme(undefined);
+            results.textContent += `Undefined theme: ${result2 ? 'HANDLED' : 'REJECTED'}\n`;
+            
+            // Verify current theme is still valid
+            const currentTheme = themeManager.getCurrentTheme();
+            results.textContent += `Current theme is valid: ${themeManager.isValidTheme(currentTheme) ? 'PASS' : 'FAIL'}\n`;
+        }
+
+        function testEmptyTheme() {
+            const results = document.getElementById('invalid-theme-results');
+            results.textContent += '\nTesting empty/whitespace themes...\n';
+            
+            console.log('=== Testing Empty/Whitespace Themes ===');
+            
+            // Test empty string
+            const result1 = themeManager.setTheme('');
+            results.textContent += `Empty string theme: ${result1 ? 'HANDLED' : 'REJECTED'}\n`;
+            
+            // Test whitespace
+            const result2 = themeManager.setTheme('   ');
+            results.textContent += `Whitespace theme: ${result2 ? 'HANDLED' : 'REJECTED'}\n`;
+            
+            // Test special characters
+            const result3 = themeManager.setTheme('!@#$%');
+            results.textContent += `Special chars theme: ${result3 ? 'HANDLED' : 'REJECTED'}\n`;
+        }
+
+        function testCSSSupport() {
+            const results = document.getElementById('css-support-results');
+            results.textContent = 'Testing CSS custom properties support...\n';
+            
+            console.log('=== Testing CSS Support Detection ===');
+            
+            // Test current support detection
+            const isSupported = themeManager.isCSSCustomPropertiesSupported();
+            results.textContent += `CSS custom properties supported: ${isSupported ? 'YES' : 'NO'}\n`;
+            
+            // Test multiple calls (should use cache)
+            const start = performance.now();
+            for (let i = 0; i < 10; i++) {
+                themeManager.isCSSCustomPropertiesSupported();
+            }
+            const end = performance.now();
+            results.textContent += `10 support checks took: ${(end - start).toFixed(2)}ms (should be fast due to caching)\n`;
+            
+            // Test fallback styling application
+            if (!isSupported) {
+                results.textContent += 'Applying fallback styling...\n';
+                themeManager.applyFallbackStyling();
+                results.textContent += 'Fallback styling applied\n';
+            }
+        }
+
+        function simulateUnsupportedBrowser() {
+            const results = document.getElementById('css-support-results');
+            results.textContent += '\nSimulating unsupported browser...\n';
+            
+            console.log('=== Simulating Unsupported Browser ===');
+            
+            // Temporarily override CSS support detection
+            const originalMethod = themeManager.isCSSCustomPropertiesSupported;
+            themeManager.isCSSCustomPropertiesSupported = () => false;
+            themeManager._cssSupported = false; // Clear cache
+            
+            // Test initialization with unsupported CSS
+            const initResult = themeManager.initializeThemeSystem();
+            results.textContent += `Initialization with unsupported CSS: ${initResult ? 'SUCCESS' : 'FAIL'}\n`;
+            
+            // Check if fallback styling was applied
+            const hasFallbackClass = document.documentElement.classList.contains('theme-fallback-mode');
+            results.textContent += `Fallback mode applied: ${hasFallbackClass ? 'YES' : 'NO'}\n`;
+            
+            // Restore original method
+            themeManager.isCSSCustomPropertiesSupported = originalMethod;
+            themeManager._cssSupported = undefined; // Clear cache
+            
+            results.textContent += 'Browser simulation complete\n';
+        }
+
+        function testStorageUnavailable() {
+            const results = document.getElementById('storage-error-results');
+            results.textContent = 'Testing storage unavailable scenarios...\n';
+            
+            console.log('=== Testing Storage Unavailable ===');
+            
+            // Test current storage availability
+            const isAvailable = themeManager.isStorageAvailable();
+            results.textContent += `Storage currently available: ${isAvailable ? 'YES' : 'NO'}\n`;
+            
+            // Simulate storage unavailable
+            const originalStorage = window.localStorage;
+            Object.defineProperty(window, 'localStorage', {
+                value: undefined,
+                writable: true
+            });
+            
+            // Clear cache and test
+            themeManager._storageAvailable = undefined;
+            const unavailableResult = themeManager.isStorageAvailable();
+            results.textContent += `Storage unavailable simulation: ${unavailableResult ? 'FAIL' : 'PASS'}\n`;
+            
+            // Test theme saving when storage unavailable
+            const saveResult = themeManager.saveThemePreference('dark');
+            results.textContent += `Save with unavailable storage: ${saveResult ? 'UNEXPECTED' : 'EXPECTED'}\n`;
+            
+            // Restore localStorage
+            Object.defineProperty(window, 'localStorage', {
+                value: originalStorage,
+                writable: true
+            });
+            themeManager._storageAvailable = undefined; // Clear cache
+            
+            results.textContent += 'Storage unavailable test complete\n';
+        }
+
+        function testStorageQuotaExceeded() {
+            const results = document.getElementById('storage-error-results');
+            results.textContent += '\nTesting storage quota exceeded...\n';
+            
+            console.log('=== Testing Storage Quota Exceeded ===');
+            
+            // Simulate quota exceeded error
+            const originalSetItem = localStorage.setItem;
+            localStorage.setItem = function(key, value) {
+                if (key === themeManager.STORAGE_KEY) {
+                    const error = new Error('Storage quota exceeded');
+                    error.name = 'QuotaExceededError';
+                    throw error;
+                }
+                return originalSetItem.call(this, key, value);
+            };
+            
+            // Test saving theme with quota exceeded
+            const saveResult = themeManager.saveThemePreference('dark');
+            results.textContent += `Save with quota exceeded: ${saveResult ? 'UNEXPECTED' : 'EXPECTED'}\n`;
+            
+            // Restore original setItem
+            localStorage.setItem = originalSetItem;
+            
+            results.textContent += 'Storage quota test complete\n';
+        }
+
+        function testDOMErrors() {
+            const results = document.getElementById('dom-error-results');
+            results.textContent = 'Testing DOM application errors...\n';
+            
+            console.log('=== Testing DOM Application Errors ===');
+            
+            // Test with valid theme first
+            const validResult = themeManager.applyThemeToDOM('dark', true);
+            results.textContent += `Valid theme application: ${validResult ? 'PASS' : 'FAIL'}\n`;
+            
+            // Test theme recovery
+            const recoveryResult = themeManager.attemptThemeRecovery();
+            results.textContent += `Theme recovery test: ${recoveryResult ? 'PASS' : 'FAIL'}\n`;
+            
+            // Test system recovery
+            const systemRecovery = themeManager.performSystemRecovery();
+            results.textContent += `System recovery success: ${systemRecovery.success ? 'PASS' : 'FAIL'}\n`;
+            results.textContent += `Recovery steps: ${systemRecovery.steps.length}\n`;
+            
+            if (systemRecovery.errors.length > 0) {
+                results.textContent += `Recovery errors: ${systemRecovery.errors.length}\n`;
+            }
+        }
+
+        function testMissingElements() {
+            const results = document.getElementById('dom-error-results');
+            results.textContent += '\nTesting missing DOM elements...\n';
+            
+            console.log('=== Testing Missing DOM Elements ===');
+            
+            // Test error display when body is missing
+            const originalBody = document.body;
+            Object.defineProperty(document, 'body', {
+                value: null,
+                writable: true,
+                configurable: true
+            });
+            
+            // Try to show error message
+            try {
+                themeManager.showUserError('Test error with missing body', false);
+                results.textContent += 'Error display with missing body: HANDLED\n';
+            } catch (error) {
+                results.textContent += `Error display with missing body: ERROR - ${error.message}\n`;
+            }
+            
+            // Restore body
+            Object.defineProperty(document, 'body', {
+                value: originalBody,
+                writable: true,
+                configurable: true
+            });
+            
+            results.textContent += 'Missing elements test complete\n';
+        }
+
+        // Initialize theme system when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing theme system for error handling tests...');
+            
+            if (typeof themeManager !== 'undefined') {
+                const initResult = themeManager.initializeThemeSystem();
+                console.log(`Theme system initialization: ${initResult ? 'SUCCESS' : 'FAIL'}`);
+                
+                // Display system status
+                const status = themeManager.getStatus();
+                console.log('Theme system status:', status);
+                
+                // Run integrity validation
+                const integrity = themeManager.validateIntegrity();
+                console.log('Theme system integrity:', integrity);
+                
+                if (!integrity.valid) {
+                    console.warn('Theme system integrity issues detected:', integrity.errors);
+                }
+            } else {
+                console.error('Theme manager not available for testing');
+            }
+        });
+    </script>
+</body>
+</html>

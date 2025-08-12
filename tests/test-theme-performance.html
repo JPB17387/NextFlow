@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme System Performance Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .performance-test {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--theme-primary-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px var(--theme-shadow-medium);
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, var(--theme-button-primary-start) 0%, var(--theme-button-primary-end) 100%);
+            color: var(--theme-header-text);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--theme-button-primary-shadow);
+        }
+        
+        .test-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .metrics-display {
+            background: var(--theme-secondary-bg);
+            border: 1px solid var(--theme-border-light);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--theme-border-light);
+        }
+        
+        .metric-item:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            font-weight: 500;
+            color: var(--theme-text-secondary);
+        }
+        
+        .metric-value {
+            font-family: 'Courier New', monospace;
+            color: var(--theme-text-primary);
+            font-weight: 600;
+        }
+        
+        .test-log {
+            background: var(--theme-task-bg);
+            border: 1px solid var(--theme-border-light);
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+            color: var(--theme-text-secondary);
+        }
+        
+        .log-entry.error {
+            color: var(--theme-error);
+        }
+        
+        .log-entry.success {
+            color: var(--theme-success);
+        }
+        
+        .log-entry.warning {
+            color: var(--theme-warning);
+        }
+        
+        .progress-indicator {
+            width: 100%;
+            height: 4px;
+            background: var(--theme-progress-bg);
+            border-radius: 2px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--theme-progress-fill-start) 0%, var(--theme-progress-fill-end) 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Theme System Performance Test</h1>
+        <div class="header-controls">
+            <div class="time-display">
+                <div id="clock">Loading...</div>
+                <div id="date">Loading...</div>
+            </div>
+            <div class="theme-selector">
+                <button class="theme-toggle-btn" id="themeToggle" aria-expanded="false" aria-haspopup="true">
+                    <span class="theme-icon">🎨</span>
+                    <span class="theme-label">Light Theme</span>
+                    <span class="theme-arrow">▼</span>
+                </button>
+                <ul class="theme-dropdown" id="themeDropdown" role="menu" aria-hidden="true">
+                    <!-- Theme options will be populated by JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="performance-test">
+            <h2>Theme System Performance Testing</h2>
+            
+            <div class="test-controls">
+                <button class="test-button" id="runBasicTest">Run Basic Test</button>
+                <button class="test-button" id="runStressTest">Run Stress Test</button>
+                <button class="test-button" id="runMemoryTest">Memory Test</button>
+                <button class="test-button" id="optimizeSystem">Optimize System</button>
+                <button class="test-button" id="clearLog">Clear Log</button>
+            </div>
+            
+            <div class="progress-indicator" id="testProgress" style="display: none;">
+                <div class="progress-bar" id="testProgressBar"></div>
+            </div>
+            
+            <div class="metrics-display">
+                <h3>Current Performance Metrics</h3>
+                <div class="metric-item">
+                    <span class="metric-label">Total Theme Changes:</span>
+                    <span class="metric-value" id="totalChanges">0</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Average Change Time:</span>
+                    <span class="metric-value" id="averageTime">0ms</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Memory Usage:</span>
+                    <span class="metric-value" id="memoryUsage">N/A</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Current Theme:</span>
+                    <span class="metric-value" id="currentTheme">white</span>
+                </div>
+            </div>
+            
+            <div class="test-log" id="testLog">
+                <div class="log-entry">Performance test console ready...</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="theme-manager.js"></script>
+    <script>
+        // Initialize theme system
+        const themeManager = new ThemeManager();
+        let testRunning = false;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Initialize theme system
+                themeManager.initializeThemeSystem();
+                
+                // Setup theme selector
+                setupThemeSelector();
+                
+                // Start clock
+                startClock();
+                
+                // Setup test controls
+                setupTestControls();
+                
+                // Update metrics display
+                updateMetricsDisplay();
+                
+                log('Application initialized successfully', 'success');
+                
+            } catch (error) {
+                log(`Initialization error: ${error.message}`, 'error');
+            }
+        });
+
+        function setupThemeSelector() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeDropdown = document.getElementById('themeDropdown');
+            
+            if (!themeToggle || !themeDropdown) return;
+            
+            // Populate theme options
+            const themes = themeManager.getAvailableThemes();
+            themeDropdown.innerHTML = '';
+            
+            themes.forEach(theme => {
+                const option = document.createElement('li');
+                option.className = 'theme-option';
+                option.setAttribute('role', 'menuitem');
+                option.setAttribute('data-theme', theme.name);
+                
+                const preview = document.createElement('div');
+                preview.className = 'theme-preview';
+                preview.style.backgroundColor = theme.preview.primaryColor;
+                
+                const name = document.createElement('span');
+                name.className = 'theme-name';
+                name.textContent = theme.displayName;
+                
+                option.appendChild(preview);
+                option.appendChild(name);
+                themeDropdown.appendChild(option);
+                
+                option.addEventListener('click', () => {
+                    selectTheme(theme.name);
+                });
+            });
+            
+            // Toggle dropdown
+            themeToggle.addEventListener('click', () => {
+                const isExpanded = themeToggle.getAttribute('aria-expanded') === 'true';
+                themeToggle.setAttribute('aria-expanded', !isExpanded);
+                themeDropdown.setAttribute('aria-hidden', isExpanded);
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!themeToggle.contains(e.target) && !themeDropdown.contains(e.target)) {
+                    themeToggle.setAttribute('aria-expanded', 'false');
+                    themeDropdown.setAttribute('aria-hidden', 'true');
+                }
+            });
+        }
+
+        function selectTheme(themeName) {
+            const startTime = performance.now();
+            
+            if (themeManager.setTheme(themeName)) {
+                const endTime = performance.now();
+                const duration = endTime - startTime;
+                
+                // Update UI
+                const themeToggle = document.getElementById('themeToggle');
+                const themeLabel = themeToggle.querySelector('.theme-label');
+                const themeConfig = themeManager.getThemeConfig(themeName);
+                
+                if (themeLabel && themeConfig) {
+                    themeLabel.textContent = themeConfig.displayName;
+                }
+                
+                // Update selected state
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    option.setAttribute('aria-selected', option.dataset.theme === themeName);
+                });
+                
+                // Close dropdown
+                themeToggle.setAttribute('aria-expanded', 'false');
+                document.getElementById('themeDropdown').setAttribute('aria-hidden', 'true');
+                
+                // Update metrics
+                updateMetricsDisplay();
+                
+                log(`Theme changed to ${themeName} in ${duration.toFixed(2)}ms`, 'success');
+            } else {
+                log(`Failed to change theme to ${themeName}`, 'error');
+            }
+        }
+
+        function setupTestControls() {
+            document.getElementById('runBasicTest').addEventListener('click', runBasicTest);
+            document.getElementById('runStressTest').addEventListener('click', runStressTest);
+            document.getElementById('runMemoryTest').addEventListener('click', runMemoryTest);
+            document.getElementById('optimizeSystem').addEventListener('click', optimizeSystem);
+            document.getElementById('clearLog').addEventListener('click', clearLog);
+        }
+
+        async function runBasicTest() {
+            if (testRunning) return;
+            
+            testRunning = true;
+            setTestButtonsState(true);
+            showProgress(true);
+            
+            log('Starting basic performance test...', 'success');
+            
+            try {
+                const results = await themeManager.testPerformance(5);
+                
+                if (results) {
+                    log(`Basic test completed:`, 'success');
+                    log(`  Average time: ${results.averageTime.toFixed(2)}ms`, 'success');
+                    log(`  Min time: ${results.minTime.toFixed(2)}ms`, 'success');
+                    log(`  Max time: ${results.maxTime.toFixed(2)}ms`, 'success');
+                    log(`  Errors: ${results.errors}`, results.errors > 0 ? 'warning' : 'success');
+                } else {
+                    log('Basic test failed', 'error');
+                }
+                
+            } catch (error) {
+                log(`Basic test error: ${error.message}`, 'error');
+            } finally {
+                testRunning = false;
+                setTestButtonsState(false);
+                showProgress(false);
+                updateMetricsDisplay();
+            }
+        }
+
+        async function runStressTest() {
+            if (testRunning) return;
+            
+            testRunning = true;
+            setTestButtonsState(true);
+            showProgress(true);
+            
+            log('Starting stress test (50 iterations)...', 'success');
+            
+            try {
+                const results = await themeManager.testPerformance(50);
+                
+                if (results) {
+                    log(`Stress test completed:`, 'success');
+                    log(`  Total time: ${results.totalTime.toFixed(2)}ms`, 'success');
+                    log(`  Average time: ${results.averageTime.toFixed(2)}ms`, 'success');
+                    log(`  Min time: ${results.minTime.toFixed(2)}ms`, 'success');
+                    log(`  Max time: ${results.maxTime.toFixed(2)}ms`, 'success');
+                    log(`  Errors: ${results.errors}`, results.errors > 0 ? 'warning' : 'success');
+                    
+                    // Performance analysis
+                    if (results.averageTime > 100) {
+                        log('WARNING: Average theme change time is high (>100ms)', 'warning');
+                    }
+                    if (results.maxTime > 300) {
+                        log('WARNING: Maximum theme change time is very high (>300ms)', 'warning');
+                    }
+                } else {
+                    log('Stress test failed', 'error');
+                }
+                
+            } catch (error) {
+                log(`Stress test error: ${error.message}`, 'error');
+            } finally {
+                testRunning = false;
+                setTestButtonsState(false);
+                showProgress(false);
+                updateMetricsDisplay();
+            }
+        }
+
+        function runMemoryTest() {
+            if (!performance.memory) {
+                log('Memory API not available in this browser', 'warning');
+                return;
+            }
+            
+            log('Running memory test...', 'success');
+            
+            const beforeMemory = performance.memory.usedJSHeapSize;
+            log(`Memory before: ${(beforeMemory / 1024 / 1024).toFixed(2)}MB`, 'success');
+            
+            // Force garbage collection if available
+            if (window.gc) {
+                window.gc();
+                const afterGC = performance.memory.usedJSHeapSize;
+                log(`Memory after GC: ${(afterGC / 1024 / 1024).toFixed(2)}MB`, 'success');
+            }
+            
+            updateMetricsDisplay();
+        }
+
+        function optimizeSystem() {
+            log('Optimizing theme system...', 'success');
+            
+            if (themeManager.optimizePerformance()) {
+                log('System optimization completed', 'success');
+            } else {
+                log('System optimization failed', 'error');
+            }
+            
+            updateMetricsDisplay();
+        }
+
+        function updateMetricsDisplay() {
+            try {
+                const metrics = themeManager.getPerformanceMetrics();
+                
+                document.getElementById('totalChanges').textContent = metrics.themeChanges;
+                document.getElementById('averageTime').textContent = `${metrics.averageChangeTime.toFixed(2)}ms`;
+                document.getElementById('memoryUsage').textContent = metrics.memoryUsageFormatted;
+                document.getElementById('currentTheme').textContent = themeManager.getCurrentTheme();
+                
+            } catch (error) {
+                log(`Error updating metrics: ${error.message}`, 'error');
+            }
+        }
+
+        function setTestButtonsState(disabled) {
+            const buttons = document.querySelectorAll('.test-button');
+            buttons.forEach(button => {
+                button.disabled = disabled;
+            });
+        }
+
+        function showProgress(show) {
+            const progress = document.getElementById('testProgress');
+            const progressBar = document.getElementById('testProgressBar');
+            
+            if (show) {
+                progress.style.display = 'block';
+                progressBar.style.width = '0%';
+                
+                // Animate progress bar
+                let width = 0;
+                const interval = setInterval(() => {
+                    width += 2;
+                    progressBar.style.width = `${Math.min(width, 90)}%`;
+                    
+                    if (width >= 90) {
+                        clearInterval(interval);
+                    }
+                }, 100);
+                
+                // Store interval for cleanup
+                progress._interval = interval;
+            } else {
+                if (progress._interval) {
+                    clearInterval(progress._interval);
+                }
+                progressBar.style.width = '100%';
+                setTimeout(() => {
+                    progress.style.display = 'none';
+                }, 500);
+            }
+        }
+
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('testLog');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function clearLog() {
+            const logContainer = document.getElementById('testLog');
+            logContainer.innerHTML = '<div class="log-entry">Performance test console cleared...</div>';
+        }
+
+        function startClock() {
+            function updateClock() {
+                const now = new Date();
+                const timeOptions = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                
+                const clockElement = document.getElementById('clock');
+                const dateElement = document.getElementById('date');
+                
+                if (clockElement) clockElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
+                if (dateElement) dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
+            }
+            
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (themeManager && typeof themeManager.cleanup === 'function') {
+                themeManager.cleanup();
+            }
+        });
+    </script>
+</body>
+</html>
