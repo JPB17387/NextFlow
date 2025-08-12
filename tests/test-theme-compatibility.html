@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Compatibility Test</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .test-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .theme-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .theme-preview-card {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 400px;
+        }
+        .theme-preview-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .theme-preview-card.active {
+            border-color: #007bff;
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.3);
+        }
+        .theme-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            color: white;
+        }
+        .theme-content {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            min-height: 200px;
+        }
+        .theme-dropdown-demo {
+            position: relative;
+            margin: 15px 0;
+        }
+        .demo-theme-selector {
+            position: relative;
+            display: inline-block;
+        }
+        .demo-theme-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .demo-theme-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--theme-primary-bg);
+            border: 1px solid var(--theme-border-medium);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--theme-shadow-medium);
+            min-width: 180px;
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            list-style: none;
+            margin: 0;
+            padding: 8px 0;
+        }
+        .demo-theme-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .demo-theme-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            color: var(--theme-text-primary);
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+        .demo-theme-option:hover {
+            background: var(--theme-secondary-bg);
+        }
+        .demo-theme-preview {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .visibility-test-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .visibility-test-overlay.show {
+            opacity: 1;
+        }
+        .contrast-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .contrast-good {
+            background: #28a745;
+            color: white;
+        }
+        .contrast-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .contrast-poor {
+            background: #dc3545;
+            color: white;
+        }
+        .measurement-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .test-log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .theme-switching-demo {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .switching-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .switching-status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Theme Compatibility Test Suite</h1>
+    <p>This test verifies that positioning works correctly with all five themes, ensures dropdown visibility and contrast in all themes, and tests theme switching while dropdown is open.</p>
+    
+    <div class="test-container">
+        <h2>Test Requirements Coverage</h2>
+        <div class="test-info">
+            <strong>Requirements being tested:</strong><br>
+            • 1.2: Proper visual hierarchy and readability across themes<br>
+            • 3.2: Visually above task cards, forms, and other content in all themes<br>
+            • 4.3: Visual alignment with header area across themes
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Theme Compatibility Test Controls</h2>
+        <button class="test-button" onclick="runComprehensiveThemeTest()">
+            Run Comprehensive Theme Test
+        </button>
+        <button class="test-button" onclick="testAllThemePositioning()">
+            Test All Theme Positioning
+        </button>
+        <button class="test-button" onclick="testThemeVisibilityContrast()">
+            Test Theme Visibility & Contrast
+        </button>
+        <button class="test-button" onclick="testThemeSwitchingWithDropdown()">
+            Test Theme Switching While Open
+        </button>
+        <button class="test-button" onclick="testThemeTransitions()">
+            Test Theme Transitions
+        </button>
+        <button class="test-button" onclick="clearTestResults()">
+            Clear Results
+        </button>
+    </div>
+
+    <div class="test-container">
+        <h2>Live Theme Switching Demo</h2>
+        <div class="theme-switching-demo">
+            <div class="switching-controls">
+                <button class="test-button" onclick="switchToTheme('white')">Light Theme</button>
+                <button class="test-button" onclick="switchToTheme('dark')">Dark Theme</button>
+                <button class="test-button" onclick="switchToTheme('student')">Student Theme</button>
+                <button class="test-button" onclick="switchToTheme('developer')">Developer Theme</button>
+                <button class="test-button" onclick="switchToTheme('professional')">Professional Theme</button>
+            </div>
+            <div id="switchingStatus" class="switching-status test-info">
+                Current Theme: Loading...
+            </div>
+            
+            <!-- Demo theme selector that stays open during theme switching -->
+            <div class="demo-theme-selector">
+                <button class="demo-theme-button" onclick="toggleDemoDropdown()">
+                    <span>🎨</span>
+                    <span>Theme Demo</span>
+                    <span>▼</span>
+                </button>
+                <ul id="demoThemeDropdown" class="demo-theme-dropdown">
+                    <li class="demo-theme-option" onclick="switchToTheme('white')">
+                        <span class="demo-theme-preview" style="background-color: #ffffff; border: 1px solid #e2e8f0;"></span>
+                        <span>Light Theme</span>
+                    </li>
+                    <li class="demo-theme-option" onclick="switchToTheme('dark')">
+                        <span class="demo-theme-preview" style="background-color: #1a202c;"></span>
+                        <span>Dark Theme</span>
+                    </li>
+                    <li class="demo-theme-option" onclick="switchToTheme('student')">
+                        <span class="demo-theme-preview" style="background-color: #3182ce;"></span>
+                        <span>Student Theme</span>
+                    </li>
+                    <li class="demo-theme-option" onclick="switchToTheme('developer')">
+                        <span class="demo-theme-preview" style="background-color: #0d1117;"></span>
+                        <span>Developer Theme</span>
+                    </li>
+                    <li class="demo-theme-option" onclick="switchToTheme('professional')">
+                        <span class="demo-theme-preview" style="background-color: #1976d2;"></span>
+                        <span>Professional Theme</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Theme Preview Grid</h2>
+        <div class="theme-preview-grid" id="themePreviewGrid">
+            <!-- Theme previews will be populated here -->
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Current Measurements</h2>
+        <div id="measurementDisplay" class="measurement-display">
+            Click "Run Comprehensive Theme Test" to see measurements...
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Results</h2>
+        <div id="testResults" class="test-result test-info">
+            Click a test button above to see results here.
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Log</h2>
+        <div class="test-log" id="testLog"></div>
+    </div>
+
+    <!-- Include required scripts -->
+    <script src="../theme-manager.js"></script>
+    <script src="../script.js"></script>    
+   
+ <script>
+        // Test framework for theme compatibility
+        class ThemeCompatibilityTest {
+            constructor() {
+                this.testResults = [];
+                this.logElement = document.getElementById('testLog');
+                this.measurementDisplay = document.getElementById('measurementDisplay');
+                this.themeManager = null;
+                this.currentTheme = 'white';
+                this.demoDropdownOpen = false;
+                this.init();
+            }
+
+            init() {
+                this.log('Initializing Theme Compatibility Test...');
+                
+                // Initialize theme manager if available
+                if (typeof ThemeManager !== 'undefined') {
+                    this.themeManager = new ThemeManager();
+                    this.themeManager.initializeThemeSystem();
+                    this.currentTheme = this.themeManager.getCurrentTheme() || 'white';
+                    this.log('Theme manager initialized');
+                } else {
+                    this.log('WARNING: ThemeManager not found');
+                }
+
+                // Set up theme preview grid
+                this.setupThemePreviewGrid();
+                
+                // Update switching status
+                this.updateSwitchingStatus();
+                
+                // Set up demo dropdown
+                this.setupDemoDropdown();
+            }
+
+            log(message) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[${timestamp}] ${message}`;
+                console.log(logMessage);
+                
+                if (this.logElement) {
+                    this.logElement.innerHTML += logMessage + '\n';
+                    this.logElement.scrollTop = this.logElement.scrollHeight;
+                }
+            }
+
+            setupThemePreviewGrid() {
+                const grid = document.getElementById('themePreviewGrid');
+                if (!grid) return;
+                
+                const themes = [
+                    { name: 'white', displayName: 'Light Theme', primary: '#ffffff', secondary: '#f7fafc', text: '#333333' },
+                    { name: 'dark', displayName: 'Dark Theme', primary: '#1a202c', secondary: '#2d3748', text: '#f7fafc' },
+                    { name: 'student', displayName: 'Student Theme', primary: '#f0fff4', secondary: '#e6fffa', text: '#1a365d' },
+                    { name: 'developer', displayName: 'Developer Theme', primary: '#0d1117', secondary: '#161b22', text: '#f0f6fc' },
+                    { name: 'professional', displayName: 'Professional Theme', primary: '#fafafa', secondary: '#f5f5f5', text: '#212121' }
+                ];
+                
+                grid.innerHTML = '';
+                
+                themes.forEach(theme => {
+                    const card = document.createElement('div');
+                    card.className = 'theme-preview-card';
+                    card.setAttribute('data-theme', theme.name);
+                    
+                    if (theme.name === this.currentTheme) {
+                        card.classList.add('active');
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="contrast-indicator" id="contrast-${theme.name}">Testing...</div>
+                        <div class="theme-header" style="background: ${theme.primary}; color: ${theme.text};">
+                            ${theme.displayName}
+                        </div>
+                        <div class="theme-content" style="background: ${theme.secondary}; color: ${theme.text};">
+                            <h4>Theme Preview</h4>
+                            <p>This shows how the theme looks with content.</p>
+                            
+                            <div class="theme-dropdown-demo">
+                                <div class="demo-theme-selector">
+                                    <button class="demo-theme-button" onclick="testThemeDropdown('${theme.name}')" 
+                                            style="background: ${theme.primary}; color: ${theme.text}; border-color: ${theme.text};">
+                                        <span>🎨</span>
+                                        <span>Test Dropdown</span>
+                                        <span>▼</span>
+                                    </button>
+                                    <ul class="demo-theme-dropdown" id="dropdown-${theme.name}">
+                                        <li class="demo-theme-option">
+                                            <span class="demo-theme-preview" style="background-color: #ffffff; border: 1px solid #e2e8f0;"></span>
+                                            <span>Light</span>
+                                        </li>
+                                        <li class="demo-theme-option">
+                                            <span class="demo-theme-preview" style="background-color: #1a202c;"></span>
+                                            <span>Dark</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="visibility-test-overlay" id="overlay-${theme.name}">
+                            Testing Visibility...
+                        </div>
+                    `;
+                    
+                    grid.appendChild(card);
+                });
+                
+                this.log('Theme preview grid set up');
+            }
+
+            setupDemoDropdown() {
+                // Demo dropdown stays open during theme switching tests
+                const demoDropdown = document.getElementById('demoThemeDropdown');
+                if (demoDropdown) {
+                    this.log('Demo dropdown set up');
+                }
+            }
+
+            updateSwitchingStatus() {
+                const statusElement = document.getElementById('switchingStatus');
+                if (statusElement) {
+                    statusElement.innerHTML = `Current Theme: <strong>${this.currentTheme}</strong>`;
+                    statusElement.className = 'switching-status test-info';
+                }
+                
+                // Update active theme in preview grid
+                const cards = document.querySelectorAll('.theme-preview-card');
+                cards.forEach(card => {
+                    if (card.getAttribute('data-theme') === this.currentTheme) {
+                        card.classList.add('active');
+                    } else {
+                        card.classList.remove('active');
+                    }
+                });
+            }
+
+            // Test Methods
+
+            runComprehensiveThemeTest() {
+                this.log('Starting comprehensive theme compatibility test...');
+                this.clearResults();
+                
+                try {
+                    // Test positioning with all themes
+                    const positioningTest = this.testAllThemePositioning();
+                    this.addTestResult('All Theme Positioning', positioningTest.passed, positioningTest.details);
+                    
+                    // Test visibility and contrast
+                    const visibilityTest = this.testThemeVisibilityContrast();
+                    this.addTestResult('Theme Visibility & Contrast', visibilityTest.passed, visibilityTest.details);
+                    
+                    // Test theme switching with dropdown open
+                    const switchingTest = this.testThemeSwitchingWithDropdown();
+                    this.addTestResult('Theme Switching With Dropdown', switchingTest.passed, switchingTest.details);
+                    
+                    // Test theme transitions
+                    const transitionTest = this.testThemeTransitions();
+                    this.addTestResult('Theme Transitions', transitionTest.passed, transitionTest.details);
+                    
+                    // Test z-index hierarchy across themes
+                    const zIndexTest = this.testZIndexHierarchy();
+                    this.addTestResult('Z-Index Hierarchy', zIndexTest.passed, zIndexTest.details);
+                    
+                    this.displayTestResults();
+                    this.updateMeasurementDisplay();
+                    
+                    this.log('Comprehensive theme compatibility test completed');
+                    
+                } catch (error) {
+                    this.log(`ERROR in comprehensive test: ${error.message}`);
+                    this.displayError(`Comprehensive test failed: ${error.message}`);
+                }
+            }
+
+            testAllThemePositioning() {
+                this.log('Testing positioning with all themes...');
+                
+                try {
+                    const themes = ['white', 'dark', 'student', 'developer', 'professional'];
+                    const positioningResults = [];
+                    const originalTheme = this.currentTheme;
+                    
+                    for (const theme of themes) {
+                        // Switch to theme
+                        this.switchToTheme(theme);
+                        
+                        // Test dropdown positioning in this theme
+                        const dropdown = document.getElementById('demoThemeDropdown');
+                        if (dropdown) {
+                            // Open dropdown
+                            dropdown.classList.add('show');
+                            
+                            // Get positioning measurements
+                            const dropdownRect = dropdown.getBoundingClientRect();
+                            const isVisible = dropdownRect.width > 0 && dropdownRect.height > 0;
+                            const isInViewport = this.isElementInViewport(dropdownRect);
+                            
+                            positioningResults.push({
+                                theme: theme,
+                                visible: isVisible,
+                                inViewport: isInViewport,
+                                width: dropdownRect.width,
+                                height: dropdownRect.height,
+                                passed: isVisible && isInViewport
+                            });
+                            
+                            // Close dropdown
+                            dropdown.classList.remove('show');
+                        }
+                        
+                        // Small delay between theme switches
+                        await this.delay(100);
+                    }
+                    
+                    // Restore original theme
+                    this.switchToTheme(originalTheme);
+                    
+                    const allPassed = positioningResults.every(result => result.passed);
+                    const details = positioningResults
+                        .map(r => `${r.theme}: visible=${r.visible}, viewport=${r.inViewport}`)
+                        .join(' | ');
+                    
+                    return {
+                        passed: allPassed,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }
+
+            testThemeVisibilityContrast() {
+                this.log('Testing theme visibility and contrast...');
+                
+                try {
+                    const themes = ['white', 'dark', 'student', 'developer', 'professional'];
+                    const contrastResults = [];
+                    const originalTheme = this.currentTheme;
+                    
+                    for (const theme of themes) {
+                        // Switch to theme
+                        this.switchToTheme(theme);
+                        
+                        // Test dropdown visibility in this theme
+                        const dropdown = document.getElementById('demoThemeDropdown');
+                        if (dropdown) {
+                            dropdown.classList.add('show');
+                            
+                            // Get computed styles
+                            const computedStyle = window.getComputedStyle(dropdown);
+                            const backgroundColor = computedStyle.backgroundColor;
+                            const color = computedStyle.color;
+                            const borderColor = computedStyle.borderColor;
+                            const boxShadow = computedStyle.boxShadow;
+                            
+                            // Test contrast (simplified check)
+                            const hasBackground = backgroundColor !== 'rgba(0, 0, 0, 0)' && backgroundColor !== 'transparent';
+                            const hasTextColor = color !== 'rgba(0, 0, 0, 0)' && color !== 'transparent';
+                            const hasBorder = borderColor !== 'rgba(0, 0, 0, 0)' && borderColor !== 'transparent';
+                            const hasShadow = boxShadow !== 'none';
+                            
+                            const contrastScore = [hasBackground, hasTextColor, hasBorder, hasShadow].filter(Boolean).length;
+                            const contrastGood = contrastScore >= 3;
+                            
+                            // Update contrast indicator
+                            const indicator = document.getElementById(`contrast-${theme}`);
+                            if (indicator) {
+                                if (contrastGood) {
+                                    indicator.textContent = 'Good';
+                                    indicator.className = 'contrast-indicator contrast-good';
+                                } else if (contrastScore >= 2) {
+                                    indicator.textContent = 'Fair';
+                                    indicator.className = 'contrast-indicator contrast-warning';
+                                } else {
+                                    indicator.textContent = 'Poor';
+                                    indicator.className = 'contrast-indicator contrast-poor';
+                                }
+                            }
+                            
+                            contrastResults.push({
+                                theme: theme,
+                                score: contrastScore,
+                                good: contrastGood,
+                                background: hasBackground,
+                                text: hasTextColor,
+                                border: hasBorder,
+                                shadow: hasShadow
+                            });
+                            
+                            dropdown.classList.remove('show');
+                        }
+                        
+                        await this.delay(100);
+                    }
+                    
+                    // Restore original theme
+                    this.switchToTheme(originalTheme);
+                    
+                    const allGood = contrastResults.every(result => result.good);
+                    const averageScore = contrastResults.reduce((sum, r) => sum + r.score, 0) / contrastResults.length;
+                    const details = `Average contrast score: ${averageScore.toFixed(1)}/4, All themes good: ${allGood}`;
+                    
+                    return {
+                        passed: allGood,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }
+
+            testThemeSwitchingWithDropdown() {
+                this.log('Testing theme switching while dropdown is open...');
+                
+                try {
+                    const dropdown = document.getElementById('demoThemeDropdown');
+                    if (!dropdown) {
+                        return { passed: false, details: 'Demo dropdown not found' };
+                    }
+                    
+                    // Open dropdown
+                    dropdown.classList.add('show');
+                    this.demoDropdownOpen = true;
+                    
+                    const themes = ['dark', 'student', 'developer', 'professional', 'white'];
+                    const switchingResults = [];
+                    
+                    for (const theme of themes) {
+                        const beforeRect = dropdown.getBoundingClientRect();
+                        const beforeVisible = dropdown.classList.contains('show');
+                        
+                        // Switch theme while dropdown is open
+                        this.switchToTheme(theme);
+                        
+                        // Check if dropdown remained open and positioned correctly
+                        const afterRect = dropdown.getBoundingClientRect();
+                        const afterVisible = dropdown.classList.contains('show');
+                        const stayedOpen = beforeVisible && afterVisible;
+                        const positionStable = Math.abs(beforeRect.left - afterRect.left) < 5 && 
+                                             Math.abs(beforeRect.top - afterRect.top) < 5;
+                        
+                        switchingResults.push({
+                            theme: theme,
+                            stayedOpen: stayedOpen,
+                            positionStable: positionStable,
+                            passed: stayedOpen && positionStable
+                        });
+                        
+                        await this.delay(200); // Allow theme transition to complete
+                    }
+                    
+                    // Close dropdown
+                    dropdown.classList.remove('show');
+                    this.demoDropdownOpen = false;
+                    
+                    const allPassed = switchingResults.every(result => result.passed);
+                    const details = switchingResults
+                        .map(r => `${r.theme}: open=${r.stayedOpen}, stable=${r.positionStable}`)
+                        .join(' | ');
+                    
+                    return {
+                        passed: allPassed,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }
+
+            testThemeTransitions() {
+                this.log('Testing theme transitions...');
+                
+                try {
+                    const dropdown = document.getElementById('demoThemeDropdown');
+                    if (!dropdown) {
+                        return { passed: false, details: 'Demo dropdown not found' };
+                    }
+                    
+                    const transitionResults = [];
+                    const themes = ['white', 'dark', 'student'];
+                    
+                    for (let i = 0; i < themes.length; i++) {
+                        const theme = themes[i];
+                        const startTime = performance.now();
+                        
+                        // Switch theme and measure transition time
+                        this.switchToTheme(theme);
+                        
+                        // Wait for transition to complete
+                        await this.delay(300);
+                        
+                        const endTime = performance.now();
+                        const transitionTime = endTime - startTime;
+                        
+                        // Check if dropdown styles updated correctly
+                        dropdown.classList.add('show');
+                        const computedStyle = window.getComputedStyle(dropdown);
+                        const hasThemeStyles = computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)';
+                        dropdown.classList.remove('show');
+                        
+                        transitionResults.push({
+                            theme: theme,
+                            time: transitionTime,
+                            stylesUpdated: hasThemeStyles,
+                            passed: transitionTime < 1000 && hasThemeStyles // Should complete within 1 second
+                        });
+                    }
+                    
+                    const allPassed = transitionResults.every(result => result.passed);
+                    const averageTime = transitionResults.reduce((sum, r) => sum + r.time, 0) / transitionResults.length;
+                    const details = `Average transition time: ${averageTime.toFixed(0)}ms, All styles updated: ${transitionResults.every(r => r.stylesUpdated)}`;
+                    
+                    return {
+                        passed: allPassed,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }
+
+            testZIndexHierarchy() {
+                this.log('Testing z-index hierarchy across themes...');
+                
+                try {
+                    const themes = ['white', 'dark', 'student', 'developer', 'professional'];
+                    const zIndexResults = [];
+                    const originalTheme = this.currentTheme;
+                    
+                    for (const theme of themes) {
+                        this.switchToTheme(theme);
+                        
+                        const dropdown = document.getElementById('demoThemeDropdown');
+                        if (dropdown) {
+                            dropdown.classList.add('show');
+                            
+                            const computedStyle = window.getComputedStyle(dropdown);
+                            const zIndex = parseInt(computedStyle.zIndex) || 0;
+                            
+                            // Check if z-index is high enough (should be 1050 or higher)
+                            const zIndexGood = zIndex >= 1050;
+                            
+                            // Check if dropdown appears above other content
+                            const rect = dropdown.getBoundingClientRect();
+                            const elementBelow = document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+                            const appearsOnTop = elementBelow === dropdown || dropdown.contains(elementBelow);
+                            
+                            zIndexResults.push({
+                                theme: theme,
+                                zIndex: zIndex,
+                                zIndexGood: zIndexGood,
+                                appearsOnTop: appearsOnTop,
+                                passed: zIndexGood && appearsOnTop
+                            });
+                            
+                            dropdown.classList.remove('show');
+                        }
+                        
+                        await this.delay(100);
+                    }
+                    
+                    this.switchToTheme(originalTheme);
+                    
+                    const allPassed = zIndexResults.every(result => result.passed);
+                    const minZIndex = Math.min(...zIndexResults.map(r => r.zIndex));
+                    const details = `Min z-index: ${minZIndex}, All appear on top: ${zIndexResults.every(r => r.appearsOnTop)}`;
+                    
+                    return {
+                        passed: allPassed,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            } 
+           // Helper Methods
+
+            switchToTheme(themeName) {
+                if (this.themeManager && typeof this.themeManager.setTheme === 'function') {
+                    const success = this.themeManager.setTheme(themeName);
+                    if (success) {
+                        this.currentTheme = themeName;
+                        this.updateSwitchingStatus();
+                        this.log(`Switched to ${themeName} theme`);
+                    } else {
+                        this.log(`Failed to switch to ${themeName} theme`);
+                    }
+                } else {
+                    // Fallback: manually set data-theme attribute
+                    document.documentElement.setAttribute('data-theme', themeName === 'white' ? null : themeName);
+                    this.currentTheme = themeName;
+                    this.updateSwitchingStatus();
+                    this.log(`Manually switched to ${themeName} theme`);
+                }
+            }
+
+            isElementInViewport(rect) {
+                return rect.top >= 0 &&
+                       rect.left >= 0 &&
+                       rect.bottom <= window.innerHeight &&
+                       rect.right <= window.innerWidth;
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            addTestResult(testName, passed, details) {
+                this.testResults.push({
+                    name: testName,
+                    passed: passed,
+                    details: details,
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            }
+
+            clearResults() {
+                this.testResults = [];
+            }
+
+            displayTestResults() {
+                const resultsElement = document.getElementById('testResults');
+                const totalTests = this.testResults.length;
+                const passedTests = this.testResults.filter(test => test.passed).length;
+                const failedTests = totalTests - passedTests;
+                
+                let resultClass = 'test-info';
+                if (failedTests === 0) {
+                    resultClass = 'test-pass';
+                } else if (passedTests === 0) {
+                    resultClass = 'test-fail';
+                } else {
+                    resultClass = 'test-warning';
+                }
+                
+                let resultsHTML = `<strong>Theme Compatibility Test Results:</strong><br>`;
+                resultsHTML += `${passedTests}/${totalTests} tests passed`;
+                if (failedTests > 0) {
+                    resultsHTML += ` (${failedTests} failed)`;
+                }
+                resultsHTML += `<br><br>`;
+                
+                this.testResults.forEach(test => {
+                    const status = test.passed ? '✓ PASS' : '✗ FAIL';
+                    resultsHTML += `<strong>${test.name}</strong> - ${status}<br>`;
+                    resultsHTML += `<small>${test.details} (${test.timestamp})</small><br><br>`;
+                });
+                
+                resultsElement.innerHTML = resultsHTML;
+                resultsElement.className = `test-result ${resultClass}`;
+            }
+
+            displayError(message) {
+                const resultsElement = document.getElementById('testResults');
+                resultsElement.innerHTML = `<strong>ERROR:</strong> ${message}`;
+                resultsElement.className = 'test-result test-fail';
+            }
+
+            updateMeasurementDisplay() {
+                try {
+                    let measurements = 'THEME COMPATIBILITY MEASUREMENTS\n';
+                    measurements += '=================================\n\n';
+                    
+                    measurements += `Current Theme: ${this.currentTheme}\n`;
+                    
+                    // Test dropdown measurements in current theme
+                    const dropdown = document.getElementById('demoThemeDropdown');
+                    if (dropdown) {
+                        dropdown.classList.add('show');
+                        
+                        const rect = dropdown.getBoundingClientRect();
+                        const computedStyle = window.getComputedStyle(dropdown);
+                        
+                        measurements += `\nDropdown Measurements:\n`;
+                        measurements += `  Size: ${Math.round(rect.width)}x${Math.round(rect.height)}\n`;
+                        measurements += `  Position: ${Math.round(rect.left)},${Math.round(rect.top)}\n`;
+                        measurements += `  Z-Index: ${computedStyle.zIndex}\n`;
+                        measurements += `  Background: ${computedStyle.backgroundColor}\n`;
+                        measurements += `  Border: ${computedStyle.borderColor}\n`;
+                        measurements += `  Shadow: ${computedStyle.boxShadow !== 'none' ? 'Yes' : 'No'}\n`;
+                        
+                        dropdown.classList.remove('show');
+                    }
+                    
+                    // Theme-specific CSS custom properties
+                    const rootStyle = window.getComputedStyle(document.documentElement);
+                    measurements += `\nTheme CSS Properties:\n`;
+                    measurements += `  Primary BG: ${rootStyle.getPropertyValue('--theme-primary-bg')}\n`;
+                    measurements += `  Text Primary: ${rootStyle.getPropertyValue('--theme-text-primary')}\n`;
+                    measurements += `  Border Medium: ${rootStyle.getPropertyValue('--theme-border-medium')}\n`;
+                    measurements += `  Shadow Medium: ${rootStyle.getPropertyValue('--theme-shadow-medium')}\n`;
+                    
+                    this.measurementDisplay.textContent = measurements;
+                    
+                } catch (error) {
+                    this.measurementDisplay.textContent = `Error getting measurements: ${error.message}`;
+                }
+            }
+        }
+
+        // Individual test functions for buttons
+        function testAllThemePositioning() {
+            if (window.themeTest) {
+                window.themeTest.testAllThemePositioning().then(result => {
+                    window.themeTest.clearResults();
+                    window.themeTest.addTestResult('All Theme Positioning', result.passed, result.details);
+                    window.themeTest.displayTestResults();
+                    window.themeTest.updateMeasurementDisplay();
+                });
+            }
+        }
+
+        function testThemeVisibilityContrast() {
+            if (window.themeTest) {
+                window.themeTest.testThemeVisibilityContrast().then(result => {
+                    window.themeTest.clearResults();
+                    window.themeTest.addTestResult('Theme Visibility & Contrast', result.passed, result.details);
+                    window.themeTest.displayTestResults();
+                    window.themeTest.updateMeasurementDisplay();
+                });
+            }
+        }
+
+        function testThemeSwitchingWithDropdown() {
+            if (window.themeTest) {
+                window.themeTest.testThemeSwitchingWithDropdown().then(result => {
+                    window.themeTest.clearResults();
+                    window.themeTest.addTestResult('Theme Switching With Dropdown', result.passed, result.details);
+                    window.themeTest.displayTestResults();
+                    window.themeTest.updateMeasurementDisplay();
+                });
+            }
+        }
+
+        function testThemeTransitions() {
+            if (window.themeTest) {
+                window.themeTest.testThemeTransitions().then(result => {
+                    window.themeTest.clearResults();
+                    window.themeTest.addTestResult('Theme Transitions', result.passed, result.details);
+                    window.themeTest.displayTestResults();
+                    window.themeTest.updateMeasurementDisplay();
+                });
+            }
+        }
+
+        function runComprehensiveThemeTest() {
+            if (window.themeTest) {
+                window.themeTest.runComprehensiveThemeTest();
+            }
+        }
+
+        function clearTestResults() {
+            if (window.themeTest) {
+                window.themeTest.clearResults();
+                document.getElementById('testResults').innerHTML = 'Click a test button above to see results here.';
+                document.getElementById('testResults').className = 'test-result test-info';
+                document.getElementById('measurementDisplay').textContent = 'Click "Run Comprehensive Theme Test" to see measurements...';
+            }
+        }
+
+        // Theme switching functions
+        function switchToTheme(themeName) {
+            if (window.themeTest) {
+                window.themeTest.switchToTheme(themeName);
+            }
+        }
+
+        function toggleDemoDropdown() {
+            const dropdown = document.getElementById('demoThemeDropdown');
+            if (dropdown) {
+                if (window.themeTest) {
+                    window.themeTest.demoDropdownOpen = !window.themeTest.demoDropdownOpen;
+                    if (window.themeTest.demoDropdownOpen) {
+                        dropdown.classList.add('show');
+                        window.themeTest.log('Demo dropdown opened');
+                    } else {
+                        dropdown.classList.remove('show');
+                        window.themeTest.log('Demo dropdown closed');
+                    }
+                }
+            }
+        }
+
+        function testThemeDropdown(themeName) {
+            if (window.themeTest) {
+                const dropdown = document.getElementById(`dropdown-${themeName}`);
+                const overlay = document.getElementById(`overlay-${themeName}`);
+                
+                if (dropdown && overlay) {
+                    // Show testing overlay
+                    overlay.classList.add('show');
+                    
+                    // Open dropdown
+                    dropdown.classList.add('show');
+                    
+                    // Test for 2 seconds
+                    setTimeout(() => {
+                        dropdown.classList.remove('show');
+                        overlay.classList.remove('show');
+                    }, 2000);
+                    
+                    window.themeTest.log(`Testing dropdown visibility in ${themeName} theme`);
+                }
+            }
+        }
+
+        // Initialize test suite when page loads
+        window.addEventListener('load', () => {
+            window.themeTest = new ThemeCompatibilityTest();
+        });
+    </script>
+</body>
+</html>

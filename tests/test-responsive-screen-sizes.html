@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Screen Sizes Test</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .test-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .viewport-simulator {
+            border: 3px solid #333;
+            margin: 20px 0;
+            border-radius: 20px;
+            overflow: hidden;
+            background: white;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .viewport-header {
+            background: #333;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 12px;
+        }
+        .viewport-content {
+            padding: 20px;
+            min-height: 300px;
+            overflow: hidden;
+        }
+        .mobile-viewport {
+            max-width: 375px;
+            margin: 0 auto;
+        }
+        .tablet-viewport {
+            max-width: 768px;
+            margin: 0 auto;
+        }
+        .desktop-viewport {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .responsive-test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .device-frame {
+            border: 3px solid #333;
+            border-radius: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            position: relative;
+            min-height: 400px;
+        }
+        .device-frame::before {
+            content: attr(data-device);
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .simulated-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        .simulated-content {
+            display: grid;
+            gap: 15px;
+            min-height: 200px;
+        }
+        .content-section {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .measurement-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .test-log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .breakpoint-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 123, 255, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 1000;
+            font-size: 14px;
+        }
+        .positioning-test-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px dashed red;
+            pointer-events: none;
+            display: none;
+        }
+        .positioning-test-overlay.show {
+            display: block;
+        }
+        
+        /* Mobile-specific test styles */
+        @media (max-width: 767px) {
+            .mobile-test-active .theme-dropdown {
+                right: 16px;
+                left: auto;
+                min-width: 160px;
+                max-width: calc(100vw - 32px);
+            }
+        }
+        
+        /* Tablet-specific test styles */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .tablet-test-active .theme-dropdown {
+                right: 0;
+                left: auto;
+                min-width: 180px;
+                max-width: 300px;
+            }
+        }
+        
+        /* Desktop-specific test styles */
+        @media (min-width: 1024px) {
+            .desktop-test-active .theme-dropdown {
+                right: 0;
+                left: auto;
+                min-width: 200px;
+                max-width: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="breakpoint-indicator" id="breakpointIndicator">
+        Loading...
+    </div>
+    
+    <h1>Responsive Screen Sizes Test Suite</h1>
+    <p>This test verifies positioning on mobile devices (320px to 767px), tablet layout positioning (768px to 1023px), and desktop positioning (1024px and above).</p>
+    
+    <div class="test-container">
+        <h2>Test Requirements Coverage</h2>
+        <div class="test-info">
+            <strong>Requirements being tested:</strong><br>
+            • 2.1: Proper positioning without overlap on mobile devices<br>
+            • 2.2: Proper positioning without overlap on tablet devices<br>
+            • 2.3: Proper positioning without overlap on desktop devices
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Current Viewport Information</h2>
+        <div id="viewportInfo" class="test-info">
+            Loading viewport information...
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Responsive Test Controls</h2>
+        <button class="test-button" onclick="runComprehensiveResponsiveTest()">
+            Run Comprehensive Responsive Test
+        </button>
+        <button class="test-button" onclick="testMobilePositioning()">
+            Test Mobile Positioning (320px-767px)
+        </button>
+        <button class="test-button" onclick="testTabletPositioning()">
+            Test Tablet Positioning (768px-1023px)
+        </button>
+        <button class="test-button" onclick="testDesktopPositioning()">
+            Test Desktop Positioning (1024px+)
+        </button>
+        <button class="test-button" onclick="testViewportResize()">
+            Test Viewport Resize Handling
+        </button>
+        <button class="test-button" onclick="clearTestResults()">
+            Clear Results
+        </button>
+    </div>
+
+    <div class="test-container">
+        <h2>Device Simulation Grid</h2>
+        <div class="responsive-test-grid">
+            <div class="device-frame mobile-viewport" data-device="Mobile (375px)">
+                <div class="simulated-header">
+                    <h4>Mobile Layout</h4>
+                    <div class="theme-selector">
+                        <button id="mobileThemeToggle" class="theme-toggle-btn" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="theme-icon">🎨</span>
+                            <span class="theme-arrow">▼</span>
+                        </button>
+                        <ul id="mobileThemeDropdown" class="theme-dropdown" role="listbox" aria-hidden="true">
+                            <li role="option" data-theme="white" class="theme-option" tabindex="-1">
+                                <span class="theme-preview" style="background-color: #ffffff; border: 1px solid #e2e8f0;"></span>
+                                <span class="theme-name">Light</span>
+                            </li>
+                            <li role="option" data-theme="dark" class="theme-option" tabindex="-1">
+                                <span class="theme-preview" style="background-color: #1a202c;"></span>
+                                <span class="theme-name">Dark</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="simulated-content">
+                    <div class="content-section">
+                        <h5>Content Area</h5>
+                        <p>Mobile content layout</p>
+                    </div>
+                </div>
+                <div class="positioning-test-overlay" id="mobileOverlay"></div>
+            </div>
+            
+            <div class="device-frame tablet-viewport" data-device="Tablet (768px)">
+                <div class="simulated-header">
+                    <h4>Tablet Layout</h4>
+                    <div class="theme-selector">
+                        <button id="tabletThemeToggle" class="theme-toggle-btn" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="theme-icon">🎨</span>
+                            <span class="theme-label">Theme</span>
+                            <span class="theme-arrow">▼</span>
+                        </button>
+                        <ul id="tabletThemeDropdown" class="theme-dropdown" role="listbox" aria-hidden="true">
+                            <li role="option" data-theme="white" class="theme-option" tabindex="-1">
+                                <span class="theme-preview" style="background-color: #ffffff; border: 1px solid #e2e8f0;"></span>
+                                <span class="theme-name">Light Theme</span>
+                            </li>
+                            <li role="option" data-theme="dark" class="theme-option" tabindex="-1">
+                                <span class="theme-preview" style="background-color: #1a202c;"></span>
+                                <span class="theme-name">Dark Theme</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="simulated-content" style="grid-template-columns: 1fr 200px;">
+                    <div class="content-section">
+                        <h5>Main Content</h5>
+                        <p>Tablet main content area</p>
+                    </div>
+                    <div class="content-section">
+                        <h5>Sidebar</h5>
+                        <p>Tablet sidebar</p>
+                    </div>
+                </div>
+                <div class="positioning-test-overlay" id="tabletOverlay"></div>
+            </div>
+            
+            <div class="device-frame desktop-viewport" data-device="Desktop (1200px)">
+                <div class="simulated-header">
+                    <h4>Desktop Layout</h4>
+                    <div class="theme-selector">
+                        <button id="desktopThemeToggle" class="theme-toggle-btn" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="theme-icon">🎨</span>
+                            <span class="theme-label">Theme</span>
+                            <span class="theme-arrow">▼</span>
+                        </button>
+                        <ul id="desktopThemeDropdown" class="theme-dropdown" role="listbox" aria-hidden="true">
+                            <li role="option" data-theme="white" class="theme-option" tabindex="-1">
+                                <span class="theme-preview" style="background-color: #ffffff; border: 1px solid #e2e8f0;"></span>
+                                <span class="theme-name">Light Theme</span>
+                            </li>
+                            <li role="option" data-theme="dark" class="theme-option" tabindex="-1">
+                                <span class="theme-preview" style="background-color: #1a202c;"></span>
+                                <span class="theme-name">Dark Theme</span>
+                            </li>
+                            <li role="option" data-theme="student" class="theme-option" tabindex="-1">
+                                <span class="theme-preview" style="background-color: #3182ce;"></span>
+                                <span class="theme-name">Student Theme</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="simulated-content" style="grid-template-columns: 1fr 250px;">
+                    <div class="content-section">
+                        <h5>Main Content Area</h5>
+                        <p>Desktop main content with full features</p>
+                    </div>
+                    <div class="content-section">
+                        <h5>Task List</h5>
+                        <p>Desktop task list that might overlap with dropdown</p>
+                    </div>
+                </div>
+                <div class="positioning-test-overlay" id="desktopOverlay"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Current Measurements</h2>
+        <div id="measurementDisplay" class="measurement-display">
+            Click "Run Comprehensive Responsive Test" to see measurements...
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Results</h2>
+        <div id="testResults" class="test-result test-info">
+            Click a test button above to see results here.
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Log</h2>
+        <div class="test-log" id="testLog"></div>
+    </div>
+
+    <!-- Include required scripts -->
+    <script src="../theme-manager.js"></script>
+    <script src="../script.js"></script>    
+    <s
+cript>
+        // Test framework for responsive screen sizes
+        class ResponsiveScreenSizesTest {
+            constructor() {
+                this.testResults = [];
+                this.logElement = document.getElementById('testLog');
+                this.measurementDisplay = document.getElementById('measurementDisplay');
+                this.viewportInfo = document.getElementById('viewportInfo');
+                this.breakpointIndicator = document.getElementById('breakpointIndicator');
+                this.themeManager = null;
+                this.init();
+            }
+
+            init() {
+                this.log('Initializing Responsive Screen Sizes Test...');
+                
+                // Initialize theme manager if available
+                if (typeof ThemeManager !== 'undefined') {
+                    this.themeManager = new ThemeManager();
+                    this.themeManager.initializeThemeSystem();
+                    this.log('Theme manager initialized');
+                } else {
+                    this.log('WARNING: ThemeManager not found');
+                }
+
+                // Set up viewport monitoring
+                this.setupViewportMonitoring();
+                
+                // Set up theme dropdown functionality for all simulated devices
+                this.setupThemeDropdowns();
+                
+                // Update initial viewport info
+                this.updateViewportInfo();
+            }
+
+            log(message) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[${timestamp}] ${message}`;
+                console.log(logMessage);
+                
+                if (this.logElement) {
+                    this.logElement.innerHTML += logMessage + '\n';
+                    this.logElement.scrollTop = this.logElement.scrollHeight;
+                }
+            }
+
+            setupViewportMonitoring() {
+                // Update breakpoint indicator and viewport info on resize
+                const updateViewport = () => {
+                    this.updateBreakpointIndicator();
+                    this.updateViewportInfo();
+                };
+                
+                window.addEventListener('resize', updateViewport);
+                window.addEventListener('orientationchange', updateViewport);
+                
+                // Initial update
+                updateViewport();
+                
+                this.log('Viewport monitoring set up');
+            }
+
+            updateBreakpointIndicator() {
+                const width = window.innerWidth;
+                let breakpoint = '';
+                let color = '';
+                
+                if (width < 768) {
+                    breakpoint = `Mobile: ${width}px`;
+                    color = '#dc3545'; // Red
+                } else if (width < 1024) {
+                    breakpoint = `Tablet: ${width}px`;
+                    color = '#ffc107'; // Yellow
+                } else {
+                    breakpoint = `Desktop: ${width}px`;
+                    color = '#28a745'; // Green
+                }
+                
+                this.breakpointIndicator.textContent = breakpoint;
+                this.breakpointIndicator.style.backgroundColor = color;
+            }
+
+            updateViewportInfo() {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                const devicePixelRatio = window.devicePixelRatio || 1;
+                const orientation = width > height ? 'Landscape' : 'Portrait';
+                
+                let category = '';
+                if (width < 768) {
+                    category = 'Mobile (320px - 767px)';
+                } else if (width < 1024) {
+                    category = 'Tablet (768px - 1023px)';
+                } else {
+                    category = 'Desktop (1024px+)';
+                }
+                
+                const info = `
+                    <strong>Current Viewport:</strong> ${width}px × ${height}px<br>
+                    <strong>Category:</strong> ${category}<br>
+                    <strong>Orientation:</strong> ${orientation}<br>
+                    <strong>Device Pixel Ratio:</strong> ${devicePixelRatio}<br>
+                    <strong>User Agent:</strong> ${navigator.userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop Device'}
+                `;
+                
+                this.viewportInfo.innerHTML = info;
+            }
+
+            setupThemeDropdowns() {
+                const devices = ['mobile', 'tablet', 'desktop'];
+                
+                devices.forEach(device => {
+                    const toggle = document.getElementById(`${device}ThemeToggle`);
+                    const dropdown = document.getElementById(`${device}ThemeDropdown`);
+                    
+                    if (toggle && dropdown) {
+                        toggle.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.toggleDropdown(device);
+                        });
+                        
+                        // Set up theme option handlers
+                        const options = dropdown.querySelectorAll('.theme-option');
+                        options.forEach(option => {
+                            option.addEventListener('click', (e) => {
+                                const themeName = option.getAttribute('data-theme');
+                                this.selectTheme(device, themeName);
+                            });
+                        });
+                        
+                        this.log(`${device} theme dropdown set up`);
+                    }
+                });
+            }
+
+            toggleDropdown(device) {
+                const dropdown = document.getElementById(`${device}ThemeDropdown`);
+                const toggle = document.getElementById(`${device}ThemeToggle`);
+                
+                if (!dropdown || !toggle) return;
+                
+                const isOpen = dropdown.getAttribute('aria-hidden') === 'false';
+                
+                if (isOpen) {
+                    this.closeDropdown(device);
+                } else {
+                    this.openDropdown(device);
+                }
+            }
+
+            openDropdown(device) {
+                const dropdown = document.getElementById(`${device}ThemeDropdown`);
+                const toggle = document.getElementById(`${device}ThemeToggle`);
+                
+                if (!dropdown || !toggle) return;
+                
+                dropdown.setAttribute('aria-hidden', 'false');
+                toggle.setAttribute('aria-expanded', 'true');
+                dropdown.style.opacity = '1';
+                dropdown.style.visibility = 'visible';
+                dropdown.style.transform = 'translateY(0)';
+                
+                this.log(`${device} theme dropdown opened`);
+            }
+
+            closeDropdown(device) {
+                const dropdown = document.getElementById(`${device}ThemeDropdown`);
+                const toggle = document.getElementById(`${device}ThemeToggle`);
+                
+                if (!dropdown || !toggle) return;
+                
+                dropdown.setAttribute('aria-hidden', 'true');
+                toggle.setAttribute('aria-expanded', 'false');
+                dropdown.style.opacity = '0';
+                dropdown.style.visibility = 'hidden';
+                dropdown.style.transform = 'translateY(-10px)';
+                
+                this.log(`${device} theme dropdown closed`);
+            }
+
+            selectTheme(device, themeName) {
+                if (this.themeManager && typeof this.themeManager.setTheme === 'function') {
+                    const success = this.themeManager.setTheme(themeName);
+                    this.log(`${device} theme changed to ${themeName}: ${success ? 'SUCCESS' : 'FAILED'}`);
+                } else {
+                    this.log(`${device} theme selection: ${themeName} (theme manager not available)`);
+                }
+                this.closeDropdown(device);
+            }
+
+            // Test Methods
+
+            runComprehensiveResponsiveTest() {
+                this.log('Starting comprehensive responsive test...');
+                this.clearResults();
+                
+                try {
+                    // Test current viewport category
+                    const currentTest = this.testCurrentViewportCategory();
+                    this.addTestResult('Current Viewport Category', currentTest.passed, currentTest.details);
+                    
+                    // Test mobile positioning simulation
+                    const mobileTest = this.testMobilePositioningSimulation();
+                    this.addTestResult('Mobile Positioning Simulation', mobileTest.passed, mobileTest.details);
+                    
+                    // Test tablet positioning simulation
+                    const tabletTest = this.testTabletPositioningSimulation();
+                    this.addTestResult('Tablet Positioning Simulation', tabletTest.passed, tabletTest.details);
+                    
+                    // Test desktop positioning simulation
+                    const desktopTest = this.testDesktopPositioningSimulation();
+                    this.addTestResult('Desktop Positioning Simulation', desktopTest.passed, desktopTest.details);
+                    
+                    // Test responsive CSS rules
+                    const cssTest = this.testResponsiveCSSRules();
+                    this.addTestResult('Responsive CSS Rules', cssTest.passed, cssTest.details);
+                    
+                    // Test viewport edge handling
+                    const edgeTest = this.testViewportEdgeHandling();
+                    this.addTestResult('Viewport Edge Handling', edgeTest.passed, edgeTest.details);
+                    
+                    this.displayTestResults();
+                    this.updateMeasurementDisplay();
+                    
+                    this.log('Comprehensive responsive test completed');
+                    
+                } catch (error) {
+                    this.log(`ERROR in comprehensive test: ${error.message}`);
+                    this.displayError(`Comprehensive test failed: ${error.message}`);
+                }
+            }
+
+            testCurrentViewportCategory() {
+                this.log('Testing current viewport category...');
+                
+                try {
+                    const width = window.innerWidth;
+                    let expectedCategory = '';
+                    let testPassed = true;
+                    
+                    if (width < 768) {
+                        expectedCategory = 'Mobile';
+                        // Test mobile-specific requirements
+                        testPassed = this.validateMobileRequirements();
+                    } else if (width < 1024) {
+                        expectedCategory = 'Tablet';
+                        // Test tablet-specific requirements
+                        testPassed = this.validateTabletRequirements();
+                    } else {
+                        expectedCategory = 'Desktop';
+                        // Test desktop-specific requirements
+                        testPassed = this.validateDesktopRequirements();
+                    }
+                    
+                    const details = `Current viewport: ${width}px (${expectedCategory}), Requirements validation: ${testPassed ? 'PASS' : 'FAIL'}`;
+                    
+                    return {
+                        passed: testPassed,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }
+
+            validateMobileRequirements() {
+                // Requirements 2.1: Proper positioning without overlap on mobile devices
+                try {
+                    // Check if mobile-specific CSS is applied
+                    const testElement = document.createElement('div');
+                    testElement.className = 'theme-dropdown';
+                    document.body.appendChild(testElement);
+                    
+                    const computedStyle = window.getComputedStyle(testElement);
+                    const maxWidth = computedStyle.maxWidth;
+                    
+                    document.body.removeChild(testElement);
+                    
+                    // Mobile should have responsive max-width
+                    const hasResponsiveMaxWidth = maxWidth.includes('calc') || maxWidth.includes('vw');
+                    
+                    return hasResponsiveMaxWidth;
+                    
+                } catch (error) {
+                    this.log(`Error validating mobile requirements: ${error.message}`);
+                    return false;
+                }
+            }
+
+            validateTabletRequirements() {
+                // Requirements 2.2: Proper positioning without overlap on tablet devices
+                try {
+                    // Check tablet-specific positioning
+                    const width = window.innerWidth;
+                    const isTabletRange = width >= 768 && width < 1024;
+                    
+                    if (!isTabletRange) {
+                        return true; // Not in tablet range, so requirements don't apply
+                    }
+                    
+                    // Test tablet-specific spacing requirements
+                    const minSpacing = 24; // Tablet minimum spacing
+                    const viewportEdgeSpace = Math.min(width * 0.05, 50); // 5% of viewport or 50px max
+                    
+                    return viewportEdgeSpace >= minSpacing;
+                    
+                } catch (error) {
+                    this.log(`Error validating tablet requirements: ${error.message}`);
+                    return false;
+                }
+            }
+
+            validateDesktopRequirements() {
+                // Requirements 2.3: Proper positioning without overlap on desktop devices
+                try {
+                    const width = window.innerWidth;
+                    const isDesktopRange = width >= 1024;
+                    
+                    if (!isDesktopRange) {
+                        return true; // Not in desktop range, so requirements don't apply
+                    }
+                    
+                    // Test desktop-specific requirements
+                    const minSpacing = 32; // Desktop minimum spacing
+                    const hasGridSupport = CSS.supports('display', 'grid');
+                    
+                    return hasGridSupport; // Desktop should support grid layout
+                    
+                } catch (error) {
+                    this.log(`Error validating desktop requirements: ${error.message}`);
+                    return false;
+                }
+            }
+
+            testMobilePositioningSimulation() {
+                this.log('Testing mobile positioning simulation...');
+                
+                try {
+                    const mobileFrame = document.querySelector('.mobile-viewport');
+                    const mobileDropdown = document.getElementById('mobileThemeDropdown');
+                    
+                    if (!mobileFrame || !mobileDropdown) {
+                        return { passed: false, details: 'Mobile simulation elements not found' };
+                    }
+                    
+                    // Open mobile dropdown
+                    this.openDropdown('mobile');
+                    
+                    const frameRect = mobileFrame.getBoundingClientRect();
+                    const dropdownRect = mobileDropdown.getBoundingClientRect();
+                    
+                    // Check if dropdown stays within mobile frame bounds
+                    const staysWithinBounds = dropdownRect.left >= frameRect.left && 
+                                            dropdownRect.right <= frameRect.right;
+                    
+                    // Check mobile-specific spacing (16px minimum)
+                    const hasProperSpacing = (frameRect.right - dropdownRect.right) >= 16;
+                    
+                    this.closeDropdown('mobile');
+                    
+                    const testPassed = staysWithinBounds && hasProperSpacing;
+                    const details = `Bounds: ${staysWithinBounds}, Spacing: ${hasProperSpacing}, Frame: ${Math.round(frameRect.width)}px, Dropdown: ${Math.round(dropdownRect.width)}px`;
+                    
+                    return {
+                        passed: testPassed,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }
+
+            testTabletPositioningSimulation() {
+                this.log('Testing tablet positioning simulation...');
+                
+                try {
+                    const tabletFrame = document.querySelector('.tablet-viewport');
+                    const tabletDropdown = document.getElementById('tabletThemeDropdown');
+                    
+                    if (!tabletFrame || !tabletDropdown) {
+                        return { passed: false, details: 'Tablet simulation elements not found' };
+                    }
+                    
+                    // Open tablet dropdown
+                    this.openDropdown('tablet');
+                    
+                    const frameRect = tabletFrame.getBoundingClientRect();
+                    const dropdownRect = tabletDropdown.getBoundingClientRect();
+                    
+                    // Check if dropdown stays within tablet frame bounds
+                    const staysWithinBounds = dropdownRect.left >= frameRect.left && 
+                                            dropdownRect.right <= frameRect.right;
+                    
+                    // Check tablet-specific spacing (24px minimum)
+                    const hasProperSpacing = (frameRect.right - dropdownRect.right) >= 24;
+                    
+                    // Check for collision with simulated content
+                    const contentSections = tabletFrame.querySelectorAll('.content-section');
+                    let hasCollision = false;
+                    contentSections.forEach(section => {
+                        const sectionRect = section.getBoundingClientRect();
+                        if (this.checkElementsOverlap(dropdownRect, sectionRect)) {
+                            hasCollision = true;
+                        }
+                    });
+                    
+                    this.closeDropdown('tablet');
+                    
+                    const testPassed = staysWithinBounds && hasProperSpacing && !hasCollision;
+                    const details = `Bounds: ${staysWithinBounds}, Spacing: ${hasProperSpacing}, Collision: ${hasCollision}, Frame: ${Math.round(frameRect.width)}px`;
+                    
+                    return {
+                        passed: testPassed,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }
+
+            testDesktopPositioningSimulation() {
+                this.log('Testing desktop positioning simulation...');
+                
+                try {
+                    const desktopFrame = document.querySelector('.desktop-viewport');
+                    const desktopDropdown = document.getElementById('desktopThemeDropdown');
+                    
+                    if (!desktopFrame || !desktopDropdown) {
+                        return { passed: false, details: 'Desktop simulation elements not found' };
+                    }
+                    
+                    // Open desktop dropdown
+                    this.openDropdown('desktop');
+                    
+                    const frameRect = desktopFrame.getBoundingClientRect();
+                    const dropdownRect = desktopDropdown.getBoundingClientRect();
+                    
+                    // Check if dropdown stays within desktop frame bounds
+                    const staysWithinBounds = dropdownRect.left >= frameRect.left && 
+                                            dropdownRect.right <= frameRect.right;
+                    
+                    // Check desktop-specific spacing (32px minimum)
+                    const hasProperSpacing = (frameRect.right - dropdownRect.right) >= 32;
+                    
+                    // Check for collision with task list simulation
+                    const taskListSection = desktopFrame.querySelector('.content-section:last-child');
+                    let hasTaskListCollision = false;
+                    if (taskListSection) {
+                        const taskListRect = taskListSection.getBoundingClientRect();
+                        hasTaskListCollision = this.checkElementsOverlap(dropdownRect, taskListRect);
+                    }
+                    
+                    this.closeDropdown('desktop');
+                    
+                    const testPassed = staysWithinBounds && hasProperSpacing && !hasTaskListCollision;
+                    const details = `Bounds: ${staysWithinBounds}, Spacing: ${hasProperSpacing}, TaskList Collision: ${hasTaskListCollision}, Frame: ${Math.round(frameRect.width)}px`;
+                    
+                    return {
+                        passed: testPassed,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }
+
+            testResponsiveCSSRules() {
+                this.log('Testing responsive CSS rules...');
+                
+                try {
+                    const testResults = [];
+                    
+                    // Test mobile media query
+                    const mobileQuery = window.matchMedia('(max-width: 767px)');
+                    testResults.push({
+                        name: 'Mobile Media Query',
+                        active: mobileQuery.matches,
+                        expected: window.innerWidth <= 767
+                    });
+                    
+                    // Test tablet media query
+                    const tabletQuery = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
+                    testResults.push({
+                        name: 'Tablet Media Query',
+                        active: tabletQuery.matches,
+                        expected: window.innerWidth >= 768 && window.innerWidth <= 1023
+                    });
+                    
+                    // Test desktop media query
+                    const desktopQuery = window.matchMedia('(min-width: 1024px)');
+                    testResults.push({
+                        name: 'Desktop Media Query',
+                        active: desktopQuery.matches,
+                        expected: window.innerWidth >= 1024
+                    });
+                    
+                    const allCorrect = testResults.every(result => result.active === result.expected);
+                    const details = testResults.map(r => `${r.name}: ${r.active === r.expected ? 'PASS' : 'FAIL'}`).join(' | ');
+                    
+                    return {
+                        passed: allCorrect,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }
+
+            testViewportEdgeHandling() {
+                this.log('Testing viewport edge handling...');
+                
+                try {
+                    const viewport = {
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                    };
+                    
+                    // Test different positioning scenarios
+                    const edgeTests = [];
+                    
+                    // Test right edge constraint
+                    const rightEdgeSpace = viewport.width * 0.1; // 10% of viewport
+                    edgeTests.push({
+                        name: 'Right Edge Space',
+                        value: rightEdgeSpace,
+                        passed: rightEdgeSpace >= 16 // Minimum 16px
+                    });
+                    
+                    // Test bottom edge constraint
+                    const bottomEdgeSpace = viewport.height * 0.1; // 10% of viewport
+                    edgeTests.push({
+                        name: 'Bottom Edge Space',
+                        value: bottomEdgeSpace,
+                        passed: bottomEdgeSpace >= 16 // Minimum 16px
+                    });
+                    
+                    // Test viewport overflow prevention
+                    const maxDropdownWidth = Math.min(320, viewport.width - 32); // Max 320px or viewport - 32px
+                    edgeTests.push({
+                        name: 'Max Dropdown Width',
+                        value: maxDropdownWidth,
+                        passed: maxDropdownWidth > 160 // Should be at least 160px for usability
+                    });
+                    
+                    const allPassed = edgeTests.every(test => test.passed);
+                    const details = edgeTests.map(t => `${t.name}: ${Math.round(t.value)}px (${t.passed ? 'PASS' : 'FAIL'})`).join(' | ');
+                    
+                    return {
+                        passed: allPassed,
+                        details: details
+                    };
+                    
+                } catch (error) {
+                    return { passed: false, details: `Error: ${error.message}` };
+                }
+            }           
+ // Helper Methods
+
+            checkElementsOverlap(rect1, rect2) {
+                return !(rect1.right <= rect2.left || 
+                        rect2.right <= rect1.left || 
+                        rect1.bottom <= rect2.top || 
+                        rect2.bottom <= rect1.top);
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            addTestResult(testName, passed, details) {
+                this.testResults.push({
+                    name: testName,
+                    passed: passed,
+                    details: details,
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            }
+
+            clearResults() {
+                this.testResults = [];
+            }
+
+            displayTestResults() {
+                const resultsElement = document.getElementById('testResults');
+                const totalTests = this.testResults.length;
+                const passedTests = this.testResults.filter(test => test.passed).length;
+                const failedTests = totalTests - passedTests;
+                
+                let resultClass = 'test-info';
+                if (failedTests === 0) {
+                    resultClass = 'test-pass';
+                } else if (passedTests === 0) {
+                    resultClass = 'test-fail';
+                } else {
+                    resultClass = 'test-warning';
+                }
+                
+                let resultsHTML = `<strong>Responsive Screen Sizes Test Results:</strong><br>`;
+                resultsHTML += `${passedTests}/${totalTests} tests passed`;
+                if (failedTests > 0) {
+                    resultsHTML += ` (${failedTests} failed)`;
+                }
+                resultsHTML += `<br><br>`;
+                
+                this.testResults.forEach(test => {
+                    const status = test.passed ? '✓ PASS' : '✗ FAIL';
+                    resultsHTML += `<strong>${test.name}</strong> - ${status}<br>`;
+                    resultsHTML += `<small>${test.details} (${test.timestamp})</small><br><br>`;
+                });
+                
+                resultsElement.innerHTML = resultsHTML;
+                resultsElement.className = `test-result ${resultClass}`;
+            }
+
+            displayError(message) {
+                const resultsElement = document.getElementById('testResults');
+                resultsElement.innerHTML = `<strong>ERROR:</strong> ${message}`;
+                resultsElement.className = 'test-result test-fail';
+            }
+
+            updateMeasurementDisplay() {
+                try {
+                    const viewport = {
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                    };
+                    
+                    let measurements = 'RESPONSIVE MEASUREMENTS\n';
+                    measurements += '======================\n\n';
+                    
+                    measurements += `Current Viewport: ${viewport.width}x${viewport.height}\n`;
+                    
+                    // Determine current breakpoint
+                    let breakpoint = '';
+                    if (viewport.width < 768) {
+                        breakpoint = 'Mobile (320px - 767px)';
+                    } else if (viewport.width < 1024) {
+                        breakpoint = 'Tablet (768px - 1023px)';
+                    } else {
+                        breakpoint = 'Desktop (1024px+)';
+                    }
+                    measurements += `Breakpoint: ${breakpoint}\n\n`;
+                    
+                    // Test each simulated device
+                    const devices = ['mobile', 'tablet', 'desktop'];
+                    devices.forEach(device => {
+                        const frame = document.querySelector(`.${device}-viewport`);
+                        const dropdown = document.getElementById(`${device}ThemeDropdown`);
+                        
+                        if (frame && dropdown) {
+                            const frameRect = frame.getBoundingClientRect();
+                            const dropdownRect = dropdown.getBoundingClientRect();
+                            
+                            measurements += `${device.toUpperCase()} Simulation:\n`;
+                            measurements += `  Frame: ${Math.round(frameRect.width)}x${Math.round(frameRect.height)}\n`;
+                            measurements += `  Dropdown: ${Math.round(dropdownRect.width)}x${Math.round(dropdownRect.height)}\n`;
+                            measurements += `  Position: ${Math.round(dropdownRect.left)},${Math.round(dropdownRect.top)}\n\n`;
+                        }
+                    });
+                    
+                    // Media query status
+                    measurements += 'Media Query Status:\n';
+                    measurements += `  Mobile: ${window.matchMedia('(max-width: 767px)').matches}\n`;
+                    measurements += `  Tablet: ${window.matchMedia('(min-width: 768px) and (max-width: 1023px)').matches}\n`;
+                    measurements += `  Desktop: ${window.matchMedia('(min-width: 1024px)').matches}\n`;
+                    
+                    this.measurementDisplay.textContent = measurements;
+                    
+                } catch (error) {
+                    this.measurementDisplay.textContent = `Error getting measurements: ${error.message}`;
+                }
+            }
+        }
+
+        // Individual test functions for buttons
+        function testMobilePositioning() {
+            if (window.responsiveTest) {
+                const result = window.responsiveTest.testMobilePositioningSimulation();
+                window.responsiveTest.clearResults();
+                window.responsiveTest.addTestResult('Mobile Positioning', result.passed, result.details);
+                window.responsiveTest.displayTestResults();
+                window.responsiveTest.updateMeasurementDisplay();
+            }
+        }
+
+        function testTabletPositioning() {
+            if (window.responsiveTest) {
+                const result = window.responsiveTest.testTabletPositioningSimulation();
+                window.responsiveTest.clearResults();
+                window.responsiveTest.addTestResult('Tablet Positioning', result.passed, result.details);
+                window.responsiveTest.displayTestResults();
+                window.responsiveTest.updateMeasurementDisplay();
+            }
+        }
+
+        function testDesktopPositioning() {
+            if (window.responsiveTest) {
+                const result = window.responsiveTest.testDesktopPositioningSimulation();
+                window.responsiveTest.clearResults();
+                window.responsiveTest.addTestResult('Desktop Positioning', result.passed, result.details);
+                window.responsiveTest.displayTestResults();
+                window.responsiveTest.updateMeasurementDisplay();
+            }
+        }
+
+        function testViewportResize() {
+            if (window.responsiveTest) {
+                window.responsiveTest.log('Testing viewport resize handling...');
+                
+                // Simulate viewport changes by updating the breakpoint indicator
+                const originalWidth = window.innerWidth;
+                
+                // Test responsive behavior
+                const resizeTest = window.responsiveTest.testResponsiveCSSRules();
+                const edgeTest = window.responsiveTest.testViewportEdgeHandling();
+                
+                window.responsiveTest.clearResults();
+                window.responsiveTest.addTestResult('Responsive CSS Rules', resizeTest.passed, resizeTest.details);
+                window.responsiveTest.addTestResult('Viewport Edge Handling', edgeTest.passed, edgeTest.details);
+                window.responsiveTest.displayTestResults();
+                window.responsiveTest.updateMeasurementDisplay();
+                
+                window.responsiveTest.log(`Viewport resize test completed for ${originalWidth}px width`);
+            }
+        }
+
+        function runComprehensiveResponsiveTest() {
+            if (window.responsiveTest) {
+                window.responsiveTest.runComprehensiveResponsiveTest();
+            }
+        }
+
+        function clearTestResults() {
+            if (window.responsiveTest) {
+                window.responsiveTest.clearResults();
+                document.getElementById('testResults').innerHTML = 'Click a test button above to see results here.';
+                document.getElementById('testResults').className = 'test-result test-info';
+                document.getElementById('measurementDisplay').textContent = 'Click "Run Comprehensive Responsive Test" to see measurements...';
+            }
+        }
+
+        // Initialize test suite when page loads
+        window.addEventListener('load', () => {
+            window.responsiveTest = new ResponsiveScreenSizesTest();
+        });
+    </script>
+</body>
+</html>

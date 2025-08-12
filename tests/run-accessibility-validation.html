@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Validation Test Runner</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-runner {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        
+        .status-indicator {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: auto;
+        }
+        
+        .status-running {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-passed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .test-results {
+            padding: 30px;
+        }
+        
+        .requirement-section {
+            margin: 30px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .requirement-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .requirement-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .requirement-score {
+            font-size: 1.1em;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 15px;
+        }
+        
+        .score-perfect {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .score-partial {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .score-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .checks-list {
+            padding: 20px;
+        }
+        
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+        
+        .check-icon {
+            font-size: 1.2em;
+            margin-right: 12px;
+            margin-top: 2px;
+        }
+        
+        .check-passed {
+            background: #d4edda;
+        }
+        
+        .check-failed {
+            background: #f8d7da;
+        }
+        
+        .check-content {
+            flex: 1;
+        }
+        
+        .check-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .check-details {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .overall-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .summary-score {
+            font-size: 3em;
+            font-weight: 300;
+            margin: 10px 0;
+        }
+        
+        .summary-status {
+            font-size: 1.3em;
+            margin: 15px 0;
+        }
+        
+        .recommendations {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .recommendations h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        
+        .recommendations ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .recommendations li {
+            margin: 8px 0;
+            color: #856404;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .test-environment {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .manual-test-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .manual-test-section h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        
+        .keyboard-shortcuts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .shortcut {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .shortcut-key {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-runner">
+        <div class="header">
+            <h1>🔍 Accessibility Validation</h1>
+            <p>Comprehensive testing for theme dropdown positioning accessibility compliance</p>
+        </div>
+        
+        <div class="controls">
+            <button id="run-all-tests" class="btn btn-primary">▶️ Run All Tests</button>
+            <button id="run-automated-tests" class="btn btn-secondary">🤖 Automated Tests Only</button>
+            <button id="run-manual-tests" class="btn btn-secondary">👤 Manual Test Guide</button>
+            <button id="export-results" class="btn btn-success" disabled>📊 Export Results</button>
+            <div class="status-indicator" id="test-status">Ready to test</div>
+        </div>
+        
+        <div class="test-environment">
+            <strong>Test Environment:</strong><br>
+            User Agent: <span id="user-agent"></span><br>
+            Viewport: <span id="viewport-size"></span><br>
+            Color Scheme: <span id="color-scheme"></span><br>
+            Reduced Motion: <span id="reduced-motion"></span>
+        </div>
+        
+        <div class="manual-test-section">
+            <h3>📋 Manual Testing Instructions</h3>
+            <p>Some accessibility features require manual testing with assistive technologies:</p>
+            
+            <div class="keyboard-shortcuts">
+                <div class="shortcut">
+                    <div class="shortcut-key">Tab / Shift+Tab</div>
+                    <div>Navigate between elements</div>
+                </div>
+                <div class="shortcut">
+                    <div class="shortcut-key">Enter / Space</div>
+                    <div>Activate buttons and dropdowns</div>
+                </div>
+                <div class="shortcut">
+                    <div class="shortcut-key">Arrow Keys</div>
+                    <div>Navigate within dropdown</div>
+                </div>
+                <div class="shortcut">
+                    <div class="shortcut-key">Escape</div>
+                    <div>Close dropdown</div>
+                </div>
+            </div>
+            
+            <p><strong>Screen Reader Testing:</strong> Enable your screen reader (NVDA, JAWS, VoiceOver) and navigate through the theme dropdown to verify announcements.</p>
+            <p><strong>Voice Control Testing:</strong> Try voice commands like "Click Theme" or "Click Light Theme" if you have voice control enabled.</p>
+        </div>
+        
+        <div id="loading" class="loading hidden">
+            <div class="loading-spinner"></div>
+            <p>Running accessibility validation tests...</p>
+        </div>
+        
+        <div id="test-results" class="test-results hidden">
+            <!-- Results will be populated here -->
+        </div>
+    </div>
+
+    <!-- Hidden test elements -->
+    <div style="position: absolute; left: -9999px; top: -9999px;">
+        <div id="test-theme-selector" class="theme-selector">
+            <button id="test-theme-btn" class="theme-toggle-btn" aria-haspopup="true" aria-expanded="false">
+                🎨 Test Theme
+            </button>
+            <div id="test-theme-dropdown" class="theme-dropdown" role="menu" aria-labelledby="test-theme-btn" style="display: none;">
+                <button class="theme-option" role="menuitem" data-theme="light">Light</button>
+                <button class="theme-option" role="menuitem" data-theme="dark">Dark</button>
+                <button class="theme-option" role="menuitem" data-theme="blue">Blue</button>
+                <button class="theme-option" role="menuitem" data-theme="green">Green</button>
+                <button class="theme-option" role="menuitem" data-theme="purple">Purple</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARIA Live Region for announcements -->
+    <div id="accessibility-announcements" aria-live="polite" aria-atomic="true" style="position: absolute; left: -9999px; top: -9999px;"></div>
+
+    <script src="../theme-manager.js"></script>
+    <script src="verify-accessibility-compliance.js"></script>
+    <script>
+        class AccessibilityTestRunner {
+            constructor() {
+                this.testResults = null;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.updateEnvironmentInfo();
+            }
+
+            setupEventListeners() {
+                document.getElementById('run-all-tests').addEventListener('click', () => this.runAllTests());
+                document.getElementById('run-automated-tests').addEventListener('click', () => this.runAutomatedTests());
+                document.getElementById('run-manual-tests').addEventListener('click', () => this.showManualTestGuide());
+                document.getElementById('export-results').addEventListener('click', () => this.exportResults());
+            }
+
+            updateEnvironmentInfo() {
+                document.getElementById('user-agent').textContent = navigator.userAgent;
+                document.getElementById('viewport-size').textContent = `${window.innerWidth} x ${window.innerHeight}`;
+                
+                const colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Dark' : 'Light';
+                document.getElementById('color-scheme').textContent = colorScheme;
+                
+                const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'Enabled' : 'Disabled';
+                document.getElementById('reduced-motion').textContent = reducedMotion;
+            }
+
+            async runAllTests() {
+                this.showLoading();
+                this.updateStatus('Running comprehensive accessibility tests...', 'running');
+                
+                try {
+                    // Initialize the compliance verifier
+                    const verifier = new AccessibilityComplianceVerifier();
+                    
+                    // Wait for tests to complete
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Get results from the verifier
+                    this.testResults = verifier.complianceResults;
+                    
+                    this.displayResults();
+                    this.updateStatus('Tests completed', 'passed');
+                    document.getElementById('export-results').disabled = false;
+                    
+                } catch (error) {
+                    console.error('Test execution error:', error);
+                    this.updateStatus('Test execution failed', 'failed');
+                    this.showError('Failed to run accessibility tests: ' + error.message);
+                }
+            }
+
+            async runAutomatedTests() {
+                this.showLoading();
+                this.updateStatus('Running automated accessibility tests...', 'running');
+                
+                try {
+                    // Run only automated tests
+                    const verifier = new AccessibilityComplianceVerifier();
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    this.testResults = verifier.complianceResults;
+                    this.displayResults();
+                    this.updateStatus('Automated tests completed', 'passed');
+                    document.getElementById('export-results').disabled = false;
+                    
+                } catch (error) {
+                    console.error('Automated test error:', error);
+                    this.updateStatus('Automated tests failed', 'failed');
+                    this.showError('Failed to run automated tests: ' + error.message);
+                }
+            }
+
+            showManualTestGuide() {
+                // Scroll to manual test section and highlight it
+                const manualSection = document.querySelector('.manual-test-section');
+                manualSection.scrollIntoView({ behavior: 'smooth' });
+                manualSection.style.animation = 'pulse 2s';
+                
+                setTimeout(() => {
+                    manualSection.style.animation = '';
+                }, 2000);
+            }
+
+            showLoading() {
+                document.getElementById('loading').classList.remove('hidden');
+                document.getElementById('test-results').classList.add('hidden');
+            }
+
+            hideLoading() {
+                document.getElementById('loading').classList.add('hidden');
+            }
+
+            updateStatus(message, type) {
+                const statusEl = document.getElementById('test-status');
+                statusEl.textContent = message;
+                statusEl.className = `status-indicator status-${type}`;
+            }
+
+            displayResults() {
+                this.hideLoading();
+                
+                if (!this.testResults) {
+                    this.showError('No test results available');
+                    return;
+                }
+
+                const resultsContainer = document.getElementById('test-results');
+                resultsContainer.classList.remove('hidden');
+                
+                let html = '';
+                let totalPassed = 0;
+                let totalChecks = 0;
+
+                // Generate requirement sections
+                Object.values(this.testResults).forEach(result => {
+                    const passed = result.checks.filter(c => c.passed).length;
+                    const total = result.checks.length;
+                    const scoreClass = passed === total ? 'score-perfect' : passed > 0 ? 'score-partial' : 'score-failed';
+                    
+                    totalPassed += passed;
+                    totalChecks += total;
+
+                    html += `
+                        <div class="requirement-section">
+                            <div class="requirement-header">
+                                <div>
+                                    <h3 class="requirement-title">Requirement ${result.requirement}</h3>
+                                    <p style="margin: 5px 0 0 0; color: #666;">${result.description}</p>
+                                </div>
+                                <div class="requirement-score ${scoreClass}">${result.score}</div>
+                            </div>
+                            <div class="checks-list">
+                                ${result.checks.map(check => `
+                                    <div class="check-item ${check.passed ? 'check-passed' : 'check-failed'}">
+                                        <div class="check-icon">${check.passed ? '✅' : '❌'}</div>
+                                        <div class="check-content">
+                                            <div class="check-name">${check.name}</div>
+                                            <div class="check-details">${check.details}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Generate overall summary
+                const overallPassed = totalPassed === totalChecks;
+                const percentage = Math.round((totalPassed / totalChecks) * 100);
+                
+                html += `
+                    <div class="overall-summary">
+                        <h2>Overall Accessibility Compliance</h2>
+                        <div class="summary-score">${totalPassed}/${totalChecks}</div>
+                        <div class="summary-status">${percentage}% Compliant</div>
+                        <p>${overallPassed ? 
+                            '🎉 Excellent! All accessibility requirements are met.' : 
+                            '⚠️ Some accessibility issues need attention.'}</p>
+                    </div>
+                `;
+
+                // Add recommendations if needed
+                if (!overallPassed) {
+                    html += this.generateRecommendations();
+                }
+
+                resultsContainer.innerHTML = html;
+            }
+
+            generateRecommendations() {
+                const failedRequirements = Object.values(this.testResults).filter(r => !r.passed);
+                
+                let recommendations = `
+                    <div class="recommendations">
+                        <h3>🔧 Recommendations for Improvement</h3>
+                        <ul>
+                `;
+
+                failedRequirements.forEach(result => {
+                    recommendations += `<li><strong>Requirement ${result.requirement}:</strong> ${result.description}</li>`;
+                    result.checks.filter(c => !c.passed).forEach(check => {
+                        recommendations += `<li style="margin-left: 20px;">• ${check.name}: ${check.details}</li>`;
+                    });
+                });
+
+                recommendations += `
+                        </ul>
+                        <p><strong>Next Steps:</strong></p>
+                        <ul>
+                            <li>Review the failed checks above</li>
+                            <li>Implement the necessary fixes in your code</li>
+                            <li>Re-run the tests to verify improvements</li>
+                            <li>Consider manual testing with actual assistive technologies</li>
+                        </ul>
+                    </div>
+                `;
+
+                return recommendations;
+            }
+
+            showError(message) {
+                this.hideLoading();
+                const resultsContainer = document.getElementById('test-results');
+                resultsContainer.classList.remove('hidden');
+                resultsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 50px; color: #721c24; background: #f8d7da; border-radius: 8px;">
+                        <h3>❌ Test Error</h3>
+                        <p>${message}</p>
+                        <button onclick="location.reload()" class="btn btn-primary">Retry Tests</button>
+                    </div>
+                `;
+            }
+
+            exportResults() {
+                if (!this.testResults) {
+                    alert('No test results to export');
+                    return;
+                }
+
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    viewport: `${window.innerWidth}x${window.innerHeight}`,
+                    results: this.testResults,
+                    summary: this.generateSummary()
+                };
+
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `accessibility-test-results-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            generateSummary() {
+                const totalPassed = Object.values(this.testResults).reduce((sum, result) => 
+                    sum + result.checks.filter(c => c.passed).length, 0);
+                const totalChecks = Object.values(this.testResults).reduce((sum, result) => 
+                    sum + result.checks.length, 0);
+                
+                return {
+                    totalPassed,
+                    totalChecks,
+                    percentage: Math.round((totalPassed / totalChecks) * 100),
+                    overallPassed: totalPassed === totalChecks
+                };
+            }
+        }
+
+        // Initialize test runner when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new AccessibilityTestRunner();
+        });
+    </script>
+</body>
+</html>

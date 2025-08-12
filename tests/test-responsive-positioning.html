@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Dropdown Responsive Positioning Test</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* Test-specific styles */
+        .test-container {
+            padding: 20px;
+            background: #f0f0f0;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        .test-info {
+            background: #e3f2fd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .positioning-test {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Theme Dropdown Responsive Positioning Test</h1>
+        
+        <div class="test-info">
+            <strong>Test Instructions:</strong>
+            <ul>
+                <li>Resize your browser window to test different screen sizes</li>
+                <li>Mobile: &lt; 768px</li>
+                <li>Tablet: 768px - 1023px</li>
+                <li>Desktop: ≥ 1024px</li>
+                <li>Click the theme button to open the dropdown and verify positioning</li>
+            </ul>
+        </div>
+
+        <!-- Header Section with Theme Selector -->
+        <header role="banner">
+            <h1>NextFlow Task Dashboard</h1>
+            <div class="header-controls">
+                <div class="time-display" role="region" aria-label="Current time and date">
+                    <div id="clock" aria-live="polite" aria-label="Current time">12:34:56</div>
+                    <div id="date" aria-live="polite" aria-label="Current date">Tuesday, August 12, 2025</div>
+                </div>
+                <div class="theme-selector" role="region" aria-label="Theme selection">
+                    <button id="themeToggle" 
+                            class="theme-toggle-btn" 
+                            aria-haspopup="listbox" 
+                            aria-expanded="false"
+                            aria-label="Select theme">
+                        <span class="theme-icon" aria-hidden="true">🎨</span>
+                        <span class="theme-label">Theme</span>
+                        <span class="theme-arrow" aria-hidden="true">▼</span>
+                    </button>
+                    <ul id="themeDropdown" 
+                        class="theme-dropdown" 
+                        role="listbox" 
+                        aria-label="Available themes"
+                        aria-hidden="true">
+                        <li role="option" data-theme="white" class="theme-option" tabindex="-1" aria-selected="true">
+                            <span class="theme-preview" style="background-color: #ffffff; border: 1px solid #e2e8f0;"></span>
+                            <span class="theme-name">Light Theme</span>
+                        </li>
+                        <li role="option" data-theme="dark" class="theme-option" tabindex="-1" aria-selected="false">
+                            <span class="theme-preview" style="background-color: #1a202c;"></span>
+                            <span class="theme-name">Dark Theme</span>
+                        </li>
+                        <li role="option" data-theme="student" class="theme-option" tabindex="-1" aria-selected="false">
+                            <span class="theme-preview" style="background-color: #f0fff4;"></span>
+                            <span class="theme-name">Student Theme</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <div class="positioning-test">
+            <h3>Positioning Test Classes</h3>
+            <p>Use browser dev tools to add these classes to .theme-dropdown to test different positions:</p>
+            <ul>
+                <li><code>position-left</code> - Left-aligned positioning</li>
+                <li><code>position-center</code> - Center-aligned positioning</li>
+                <li><code>position-offset-left</code> - Offset left positioning (desktop only)</li>
+                <li><code>position-offset-right</code> - Offset right positioning (desktop only)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Simple theme dropdown toggle for testing
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const dropdown = document.getElementById('themeDropdown');
+            const isOpen = this.getAttribute('aria-expanded') === 'true';
+            
+            this.setAttribute('aria-expanded', !isOpen);
+            dropdown.setAttribute('aria-hidden', isOpen);
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const themeSelector = document.querySelector('.theme-selector');
+            if (!themeSelector.contains(e.target)) {
+                document.getElementById('themeToggle').setAttribute('aria-expanded', 'false');
+                document.getElementById('themeDropdown').setAttribute('aria-hidden', 'true');
+            }
+        });
+    </script>
+</body>
+</html>

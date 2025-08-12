@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Grid Layout Positioning Test</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* Test-specific styles */
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--theme-secondary-bg);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .test-section {
+            background: var(--theme-primary-bg);
+            border: 1px solid var(--theme-border-light);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .test-results {
+            font-family: monospace;
+            background: var(--theme-task-bg);
+            border: 1px solid var(--theme-border-medium);
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        
+        .test-pass {
+            color: var(--theme-success);
+            font-weight: bold;
+        }
+        
+        .test-fail {
+            color: var(--theme-error);
+            font-weight: bold;
+        }
+        
+        .test-warning {
+            color: var(--theme-warning);
+            font-weight: bold;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .test-btn {
+            background: var(--theme-accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .test-btn:hover {
+            background: var(--theme-accent-hover);
+        }
+        
+        .test-btn.secondary {
+            background: var(--theme-text-muted);
+        }
+        
+        .task-height-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .task-height-control input[type="range"] {
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        /* Visual indicators for testing */
+        .collision-indicator {
+            position: absolute;
+            border: 2px dashed var(--theme-error);
+            background: rgba(229, 62, 62, 0.1);
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        .spacing-indicator {
+            position: absolute;
+            border: 1px solid var(-
+         105, 0.1);
+            pointer-events: none;
+            z-index: 998;
+        }
+        
+        /* Force desk
+        @media (min-wi24px) {
+            main {
+                display: grid;
+                grid-template-col1fr;
+                gap: 2rem;
+         x;
+            }
+            
+         
+                grid-column: 1;
+            }
+            
+            .task-list-section {
+                grid-column: 2;
+                grid-row: 1;
+            }
+            
+         {
+                grid-column: 1;
+            }
+            
+            .suggestions-on {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- -->
+    <header role="b">
+        <h1>Desktop Grid Layout h1>
+        <div class="header-controls">
+            <div class="time-di
+                <div id="c>
+                <div id="da</div>
+            </div>
+            <div class="theme">
+                <button id="themeTo" 
+                        clas
+         x" 
+            
+       heme"
+      elp">
+                    <span class="theme-icon" aria-hiddespan>
+                    <span class="theme-label">Theme</span>
+    
+                </button>
+                <div id="theme-help" class=</div>
+                <ul id="themeDrown" 
+                    class="theme-dropdown" 
+                    role="listbox" 
+                    aria-label="Available themes"
+                    aria-hidden="true">
+              n" 
+                 
+                        cln" 
+                        tabindex="-1"
+                        aria-selected="te">
+                        <span class="theme-preview" style="background-color: #ffffan>
+                        <span class="them>
+                    </li>
+                    <li role="option" 
+                        data-theme="dark" 
+                        class="theme-option" 
+                        tabindex="-1"
+                        aria-selected="false">
+                        <span class="theme-preview" styl/span>
+                        <span class="theme-name">Darkn>
+                    </li>
+                    <li role="option" 
+                        data-theme="student" 
+                        class="theme-option" 
+                        tabindex=
+                        aria-selected="false">
+                        <span class="theme-preview"
+                        <span class="theme-
+                    </li>
+                    <li role="option" 
+                        data-theme="developer" 
+                        class="theme-option" 
+                        tabindex="-1"
+                        aria-sele
+                        <span class="theme-preview" style="background-color: #0d1117;" aria-hidden="true"></span>
+                        <span class="theme-name">Developer Theme</span>
+                    </li>
+                    <li role="opt
+                        data-theme="professional" 
+                        class="theme-option" 
+                        tabindex="-1"
+                        aria-sele
+                        <span class="theme-preview" style="background-color: #1976d2;" aria-hidden="true"></span>
+                        <span class="theme-name">Professional Theme</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Test Controls -->
+    <div class="test-conta">
+        <h2>Desktop Grid 
+trols">
+            <button class="test-btn" onclick="r</button>
+            <button class="test-btn" onclick=">
+            <button class="test-btn" onclick="testS</button>
+            <button class="test-btn" onclick="test
+            <button class="test-btn secondary" onclick="clearTestResults()">Clear Results</button>
+            <button class="test-btn secondary" onclick="toggleVisualIndicators()">Toggle Visual Indicators</button>
+        </div>
+        
+        <div class="task-heigh>
+            <label for="tal>
+            <input tlue="5" 
+                   oninput="adjustTaskListHeight(this.value)">
+            <span id="taskHeightValue">5 ta
+        </div>
+        
+        <div id="testResults" class="test-results">
+Test results will appear here...
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main role="main">
+        <!-- Task n -->
+        <sectiing">
+          2>
+">
+                <div class="form">
+                    <label for="taskName">
+                    <input type="text" id="taskName" name="taskName" placeholder 
+                           aria-describedby="t">
+                 >
+                </div>
+                
+                <
+                    <label for="taskCategory">Category: <span aria-label="r
+                    <select id="taskCatego
+                 option>
+                        <option value="Work">Work</option>
+                        <option value="Stu
+                 
+                    </select>
+                    <div id="taskCategodiv>
+                </div>
+                
+                <div clas">
+                 
+          
+div>
+                </div>
+                
+                <button type="button" id="addTaskBtn" aria-descri
+                <div id="addTask-help" class="sr-only">Click to add the task 
+            </orm>
+        </ction>
+
+        <!-- Task List Section -->
+        <section class="task-ng">
+            <h2 id="task-list-heading">Your Tasks</h2>
+            <div id="taskList" role="list" aria-label="Tas">
+              d here -->
+          v>
+>
+
+        <!-- Progress Bar->
+        <section class="progress-section" role="r">
+          >
+ 
+                 aria-label="Task coms">
+                <div id="progressBar"></div>
+                <span id="progressLabel" >
+      </div>
+        </se>
+
+        <!-- Suggestions Section -->
+        <section class="sug
+            <h2 id="suggestions-headin
+            <button id="suggestionBtn" aria-describedby="suggestion-h
+            <div id="suggestion-help" class="sr-only">Get a helpful productivity tip</di
+            <textarea id="suggestionText"ips!" 
+                      aria-lrea>
+        </secon>
+>
+
+    <!-- Footer Section -->
+    <footer role">
+        <p>© 2025 NextFlow • Desktop Grid Layout Positioest</p>
+    </footer>
+
+    <script src="../theme-manager.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        // Test-specific JavaScript
+        let testR[];
+false;
+        
+        // Initialize test environment
+        document) {
+            // Populate task list with sample tasks for testing
+            populateTestTasks(5);
+            
+ystem
+            if (typeof The) {
+                const themeManager = new ThemeManager();
+                themeManager.initializeThemeSystem();
+                
+                
+                setupThemeDropdownHand
+            }
+            
+            logTe.');
+        });
+ 
+        function populateTestTasks(co
+            const taskList = document.getElementById('taList');
+            taskList.innerHTML = '';
+            
+            const sampleTasks = [
+                { name: ' },
+                { name: 'Review quarterly reports', category: 'Work', time: '14},
+                {
+             :00' },
+
+                { name: 'Read tech,
+                { name: 'Exercise routine', category: 'Personal', time: '07' },
+                { name: 'Code review session', category: 'Work', time: '15:00' 
+                },
+                { name: 'Plan weekend activities', 
+                { name: 'Database optimization', category: 'Work',
+                { name: 'Algorithm practice00' },
+                { name: 'Home maintenance', ca
+                { name: },
+                { na' },
+                { name: 'Family dinner', category: },
+                { name: 'Bug fixing session', category: 'Work', time: '09:30' },
+                { name: 'Online course completi },
+                { name: 'Doctor appointment', category: 'Personal' },
+                { name: 'Sprint planning meeting', category: 'Work', time: '10:3' }
+            ];
+            
+            for (let i +) {
+                consasks[i];
+                const taskElement = createTaskElement({
+                    id: i}`,
+                    name: task.name,
+                 .category,
+             
+asks
+                });
+                taskList.appendChild(taskElement);
+            }
+        }
+        
+        functiontask) {
+            const taskItem = document.createElement('div');
+            task;
+            taskItem.setAttriid);
+            
+            const checkb
+            checkbox.type = 'checkbox';
+            check
+            cd;
+
+            const taskConten);
+            taskContent.className = 'task-content';
+            
+            cons'div');
+            taskName.className = 'task-name';
+            task
+            
+            const taskMeta = document.createElement('div');
+            taskMeta.className = 'task-meta';
+            
+            const categoryTag = document.createElement('spa');
+            cate
+            categoryTag.textContent = task.category;
+            task);
+            
+            if (task.time) {
+                const timeDisplay = document.createElement('span');
+                timeDisplay.className = 'task-time';
+                te);
+             ;
+
+            
+            taskContent.appendChild(taskName);
+            taskContent.appendChild(taskMeta);
+            
+            const deleteButton = document.createE
+            deledelete';
+            deleteButton.textContent = 'Delete';
+            
+            taskItem.appendChild(checkbox);
+            taskItem.appendChild(taskContent);
+            taskItem.appendChild(deleteButton);
+            
+            return taskItem;
+        }
+
+        function formatTaskTime(timeg) {
+            if (!timeString) return '';
+            
+            try {
+                const [h':');
+                const hour = parseInt(hours, 10);
+                c
+                
+                con
+                constr;
+(2, '0');
+                
+                return `${displayHour}:${displayMinute} ${period}`;
+            } catch (error) {
+                tring;
+            }
+        }
+        
+        function setupThemeDropdownHandlers(themeManager) {
+            const the');
+            const themeDropdown = document.getElementById('themeDropdown');
+            
+            if (!themeToggle || !themeDropdown) return;
+            
+            themeToggle.addEventListener('click', function() {
+                const isExpanded = themeToggle.getAttribute('aria-expanded;
+                
+                if (d) {
+                    // Opening dropdown - calculate png
+                    const positioningResult = calculateDropdownPosition();
+                    if (positioningResult.success) {
+                    
+                    }
+                    
+                    themeToggle.setAttribute('aria-expanded', 'true');
+                    );
+                } else {
+                    themeToggle.setAttribute('aria-e');
+                    true');
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                it)) {
+             
+;
+                }
+            });
+            
+            // Handletion
+            themeDropdown.addEventListener('click', func{
+                const option = event.tar');
+                if (
+                    const theme = option.getAttribute('data-theme');
+                    if (theme && themeManager) {
+                    heme);
+                        
+                        // Update selected state
+                     
+                    
+                        });
+                        option.setAttribute('aria-selected', 'true');
+                        
+                        // Close dropdow
+                        themeToggle.setAttribute('aria-expanded', 'false');
+                    ');
+                    }
+                }
+            });
+        }
+        
+        function calculateDropdownPosition() {
+            try {
+                const dropdown = document.querySelector('.theme-dropdown');
+                const button = document.querySelector('.theme-toggle-btn');
+                const taskLi;
+                
+                if (!dropdown || !button) {
+                    r;
+                }
+                
+                cons;
+                const taskListRect = taskList ? taskList.getBoundingClientRect() : null;
+                consh;
+                const viewpoght;
+                
+                // Estimate dropdown dim
+                const 0;
+                cons50;
+                
+                // Calculate potential dropdown position
+                cdth;
+             h;
+8;
+                const dropdownBottom = dropd;
+                
+                ;
+                let c
+                
+                // Check for collision with task list
+                if (taskListRect) {
+                    
+                    const verticalOverlap = d
+                    
+                    if (horizontalOverlap && verticalOverlap) {
+                        hasCollision = true;
+                        collisionDetails.push({
+                      ',
+                    rlap: {
+                                horizontal: horizontaverlap,
+                                vertical: vert,
+                                overlapWidtt),
+                                overlapHeight: Math.min(dropdow
+                            }
+                        }
+                    }
+                }
+                
+                // Check viewport boundaries
+                const vi = {
+                    right: dropdownRight > viewportWidth,
+                    bottom: dropdownBottom > viewportHeight,
+                    left,
+                    top: dropdownTop < 0
+                };
+                
+                if (Object.values(viewportCollision).some(collision => collision)) {
+                    hasColli
+                    collisionDetails.push({
+                        element: 'viewport',
+                        boundaries: viewportCollision
+                    });
+                }
+                
+                // Determ strategy
+                let recondard';
+                let adjustments = {};
+                
+                if ( {
+                    // Collision detected - detng
+                    if (taskListRect && dropdownRight > taskLift) {
+                    
+                        const leftAlignedRight = buttonRect.left + estimatedDropd
+                        if (leftAlignedRight < taskListRect.left || leftAlignedRight < viewportWidth * 0.8) {
+                    ed';
+                             true;
+                        } else {
+                            // Try centeioning
+                      
+                    r = true;
+                        }
+                    }
+                }
+                
+                return {
+                    success: true,
+                on,
+                    cls,
+                    recommendation,
+                    ents,
+                    measurements: {
+                        button: butt,
+                        taskList: taskListRect,
+                      },
+                    : {
+                            left: dropdownLeft,
+                            right: dro
+                            top: dropdownTop,
+                            bottom: dropdownBottom,
+                      nWidth,
+                    ght
+                        }
+                    }
+                };
+                
+            } catch (error) {
+                return { success: false, error: error.messge };
+            }
+        }
+        
+        function applyCollisionAvoidance(dropdown, posit) {
+            if (!dropdown || !positioningResult.success) return;
+            
+            // Remove existing positioning classes
+            dropdown
+            
+            // Apply new positioning based on recommendation
+            switch (positioningResult.recommendation) {
+                case :
+                    
+                    break;
+                case 'center-aligned':
+                    dropdown.classList.add('position-center');
+                    b;
+                default:
+                    // Standard posal classes
+                    break;
+            }
+        }
+        
+        function adjustTaskListHeight(value) {
+            document
+            populateTestTasks(parseInt(value));
+            
+            // Clear any existing test results since layout changed
+            if (testResults.length > 0) {
+                logT);
+            }
+        }
+        
+        function runAlTests() {
+            clearTes
+            logTestMessage('Startn');
+            
+            // Teon
+            c);
+       
+            // Test 2: Spacing requirements
+            const spacingResult = testSpacingRequirements();
+            
+            // Test 3
+            const heightResult = testVaryingTaskHeights();
+            
+            // Summary
+            const tot;
+            const pa
+            
+            logTestMessage(`\n=== TEST SUMMARY ===`);
+            logTestMessage(`Total Tests: ${totalTests}`);
+            logTestMessage(`Passed: ${passedTests}`, passedTests === totalTests ?);
+            logTestMessage(`Failed: ${totalTests - passedTests}`, passedTests === toail');
+            logTestMes;
+            
+            if (passedTests === totalTests) {
+                logTss');
+            } else {
+                logTestMessage('\n❌ Some ;
+            }
+        }
+        
+        function testDropap() {
+            logTestMessa);
+            
+            try {
+                // Force dropdown to be visible for testing
+                const dropdown = document.querySelector('.theme-dropdown');
+                const button = document.querySelector('.theme-toggle-btn');
+                
+                if (!dropdown || !button) {
+                    logTestMessage('❌ Required elements not found', 'fail');
+                    retu
+                }
+                
+                // Temporarily show dropdown fort
+                const originalDisplay = dropdown.stay;
+                const originalVisibility = dropdown.style.vis
+                const origiopacity;
+                
+                dropdown.style.display = 'blo';
+                dropd;
+                drop
+                dropdown.setAttribute('
+                
+                // C
+                const positioningResult = calculateDropdownPosition();
+                
+                // Restore original state
+                dropdown.style.displalDisplay;
+                dropy;
+                dropdown.sty
+                dropdown.setAttribute('ari
+                
+                if (!p {
+                    ail');
+                    return { pass };
+                }
+                
+             
+.some(
+                    detail => detail.elemenn'
+                );
+                
+                if (h {
+                    const overlapDetail = positioningResult.collisionDetails.find(
+                        detail => detail.n'
+                    );
+                    
+                    ng');
+                    logTestMessage(`   Overlap Width: ${overlapDetail.overlap;
+                    logTestMessage(`   Overlap Height: ${overlap;
+                    
+                    // Check if co
+                    if (positioningResult.recommendation !== 'standard') {
+                     ;
+                    , 'pass');
+                        return { passed: true, hasOverlap: true, avo
+                    } else {
+                    );
+                        return { passed: false, hasOverlap: true, avoidanceAct };
+                    }
+                } el {
+                    logTestMessage('✅ No 'pass');
+                    logTestMessage(`✅ Positioning strategy: ${positioningResult.recommendation}`,pass');
+                    ralse };
+                }
+                
+            } catch (error) {
+                logTestMessage(`❌ Test failed with error: ${error.message}`, 'fail');
+                return { passed: false, error: error.message };
+            }
+        }
+        
+        function testSpacing) {
+            logTestMessage('\n--- Test 2: Spacing R---');
+            
+            try {
+                consn');
+                const button = do
+                const taskList = document.querySelector('.task-list-section');
+                c
+                
+                if (!d{
+
+                    return { passed: false, erro };
+                }
+                
+                // Get element measurements
+                const buttonRect = button.getBounditRect();
+             
+
+                const viewportWidth = w
+                
+                // Check desktop layout 
+                const isDesktopLayout = viewportWidth >= 104;
+                
+             yout) {
+ing');
+                    log
+                    return { passed: true, skipped: true, reason: 'Not 
+               }
+     
+                logTestMessage(`✅ Desktop layout detecpass');
+                
+                // Test minimum spas
+                const minDesktopSpants
+                const minButtonSpacinements
+                
+                // 
+             ight;
+left;
+                
+                logTestMessage(`Button}px`);
+             
+    
+                if (rightEdgeSpacicing) {
+                    logTestMessage(`✅ Adequate edge spacing (min: ${minDesktopss');
+                } else {
+                    logTestMessage(`⚠️  Edge spacing below minimum (min: ${minDesktopSpa;
+                }
+                
+                // Check spacing between butto
+                const horizontalGap = Ma;
+                logTestMessage(`Horizontal gap(2)}px`);
+                
+                if (horizontalGap >= minDeskto
+                    logT;
+                } else {
+                 
+                }
+                
+                // Check header alignment
+                if (headerRect) {
+                    const headerAlignment = Math.abs(buttonRec
+                 ;
+                    
+                rance
+                        logTestMessage('✅ Good hea
+                    } else {
+                        logTestMessage('⚠️  Button may not be properly aligned with);
+                    }
+                }
+                
+                logTestMessage('✅ Spacing requirements 
+                return { passed: true, measurements: { rightEdgeSpacing,} };
+                
+
+                logTestMessage(`❌ S);
+                return { passed: false, error: error.message };
+            }
+        }
+        
+) {
+            logTestMessage('\n--- Test 3');
+            
+            try {
+                const testHeights = [1, 5, 10, 15, 20];
+                let allTestsPassed = true;
+                conss = [];
+                
+                for (const height of testHeights) {
+                    ;
+                    
+                    // Adjust task list height
+                    populateTestTasks(height);
+                    
+                    ettle
+                    setTimeout(() =
+                    
+                    // Test positioning with this height
+                    c();
+                    
+                    if (!positionincess) {
+                        logTestMessage(`  ❌ Positioning failed for ${heighl');
+                        allTestsPassed = false;
+                     
+                    nue;
+                    }
+                    
+                    
+                        detail => detail.element === 'task-list-section'
+                    );
+                    
+                    if (hasOverlap && positioningResult.recommendation === 'standard') {
+                 l');
+             false;
+         });
+{
+                        const status = hasOverlap';
+                        logTestMessage(` ;
+                        results.push(;
+                    }
+                }
+                
+                // Restore original task count
+                populateTestTasks(5);
+                
+          {
+
+                } else {
+                    logTestMessage('❌fail');
+                }
+                
+                return { passed: allTestsPassed, results };
+                
+            } catch (error) {
+             il');
+         ;
+
+        }
+        
+        function toggleVisualIndicators() {
+            visualIndicatorsEnabled = !visualIndic
+            
+            if (visualIndicatorsEnabled) {
+                showVisualIndicators();
+             
+          {
+
+                logTestMessage('Visual indicators diled');
+            }
+        }
+        
+        function showVisualIndicators() {
+            // Remove existing indicators
+            hideVisualIndicators();
+            
+         
+');
+            
+            if (!dropdown || !taskLisn;
+            
+            /ent
+         ;
+
+            dropdown.style.visibility
+            dropdown.style.opacity = ';
+            
+            const dropdownRect = dropdown.getBoundingClientRect();
+            const taskListRect = taskList.getBoundingClientRect();
+            
+            /rlap
+         
+bottom;
+            
+            if (horizontalOverlap && verticalOvlap) {
+                const overlapLeft = Math.max(dropdownRect.left, tat.left);
+           
+             
+       
+       >
+</html
+</body> </script>
+   , 1000);  }
+      nOverlap();tDropdow tes      ..');
+     t.itioning tesg basic posinto-runne('AustMessag      logTe    
+  ut(() => { setTimeooad
+       c tests on lto-run basi    // Au 
+     }
+       
+       eight;.scrollHtsElementlTop = resulent.scrolesultsElem     r     o bottom
+  croll t    // S              
+     n('\n');
+  ).joi        pan>`
+   essage}</sesult.msName}">${r{result.clas class="$  `<span            ult => 
+  ap(resestResults.mnnerHTML = tt.ilemenresultsE           e display
+  // Updat          
+        ;
+     className })pe, Entry, tyessage: logush({ mts.pestResul     t
+       }`;ge{messa] ${timestamp}[$= `y onst logEntr      c 
+                     }
+     '';
+   lassName =      c          ault:
+           def          break;
+                    ing';
+t-warnesassName = 't   cl             ':
+    ing'warnse     ca  
+          reak;     b           
+    l';est-faiName = 't   class               fail':
+  ase '      c          eak;
+    br          ;
+      ss' = 'test-paclassName                s':
+     'pascase               
+ ype) {itch (t      sw      
+           
+ ame = '';let classN           = '';
+   prefixlet                  
+  ng();
+    StritoLocaleTimew Date().tamp = neonst times    c      ts');
+  ResulId('testetElementByment.gment = docuEletsresul      const      {
+   'info') =ge, typessaMessage(mesttion logTeunc  f  
+             }
+   );
+    s(atorisualIndic       hideV.';
+     r new tests Ready foed.lts clearst resuontent = 'TetC.texementtsElulres           ;
+ Results')ntById('testgetElemement.ement = docuresultsEl      const       s = [];
+tResult    tes     
+   lts() {estResuction clearT  fun
+            }
+          ;
+e())or.removindicator => ch(indicatEas.forndicator         ior');
+   ng-indicatspacir, .icatollision-indcoorAll('.querySelectnt. = documendicatorsconst i        () {
+    rstosualIndicaction hideVifun
+        
+        
+        }y = '0';tyle.opacitown.sropd       d;
+     n'ity = 'hiddebille.visisty  dropdown.
+          y;Displainalay = origyle.displopdown.st  dr     ate
+     dropdown ste / Restor          /           
+cator);
+   ndiild(spacingIappendChcument.body.        do  
+             20}px`;
+ ect.top) + taskListRp, nRect.todropdow - Math.min(om)ct.botttaskListRect.bottom, ropdownReath.max(dght = `${Mle.heior.stygIndicat spacin          }px`;
+ + 20ct.left) , taskListReRect.leftdownth.min(dropight) - MastRect.r, taskLit.rightec(dropdownR${Math.maxe.width = `.styltorcingIndica   spa     0}px`;
+     - 1top)askListRect..top, tnRectin(dropdow= `${Math.me.top or.stylingIndicatpac      s      `;
+px - 10}t.left)taskListRec, nRect.left.min(dropdowft = `${Mathtor.style.legIndicain        spac
+    indicator';g-me = 'spacinator.classNagIndic     spacin      'div');
+ ateElement(cument.credo = dicatorcingInspa const            dicators
+acing ine sp Creat      //        
+     }
+                ator);
+ nIndic(collisiondChildpet.body.apumen  doc                    
+          apTop}px`;
+rlm - oveerlapBotto{ov `$ight =e.heicator.styllisionInd     col          x`;
+ verlapLeft}pht - ooverlapRigh = `${style.widtor.Indicat  collision            Top}px`;
+  overlap `${ =tyle.topcator.sionIndilis         col       
+x`;lapLeft}pft = `${overor.style.ledicatisionIn        coll       ;
+ tor'indica 'collision- =r.classNamesionIndicato colli           ;
+    ')t('divElemenreatet.ccumentor = dondica collisionIonst        c        
+         

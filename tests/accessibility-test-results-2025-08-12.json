@@ -1,0 +1,109 @@
+{
+  "timestamp": "2025-08-12T18:51:09.973Z",
+  "summary": {
+    "totalPassed": 17,
+    "totalTests": 17
+  },
+  "requirements": {
+    "5.1": "Maintain proper focus management when dropdown opens",
+    "5.2": "Ensure keyboard navigation works regardless of positioning",
+    "5.3": "Provide proper screen reader announcements",
+    "5.4": "Prevent positioning changes from breaking accessibility features",
+    "5.5": "Provide clear indication of dropdown state and options for assistive technologies"
+  },
+  "results": {
+    "keyboardNavigation": [
+      {
+        "name": "Tab navigation to theme button",
+        "passed": true,
+        "details": "Theme button is properly included in tab order"
+      },
+      {
+        "name": "Enter/Space opens dropdown",
+        "passed": true,
+        "details": "Dropdown opens correctly with keyboard activation"
+      },
+      {
+        "name": "Arrow keys navigate options",
+        "passed": true,
+        "details": "Arrow key navigation works correctly"
+      },
+      {
+        "name": "Escape closes dropdown",
+        "passed": true,
+        "details": "Escape key functionality works correctly"
+      },
+      {
+        "name": "Focus trap within dropdown",
+        "passed": true,
+        "details": "Focus properly trapped within dropdown"
+      }
+    ],
+    "screenReaderAnnouncements": [
+      {
+        "name": "ARIA attributes present",
+        "passed": true,
+        "details": "All required ARIA attributes are present"
+      },
+      {
+        "name": "Dropdown state announced",
+        "passed": true,
+        "details": "Dropdown state changes are properly announced via aria-expanded"
+      },
+      {
+        "name": "Options have proper roles",
+        "passed": true,
+        "details": "All options have proper menuitem roles and accessible names"
+      },
+      {
+        "name": "Live region for announcements",
+        "passed": true,
+        "details": "ARIA live region properly configured for announcements"
+      }
+    ],
+    "focusManagement": [
+      {
+        "name": "Focus moves to dropdown when opened",
+        "passed": true,
+        "details": "Focus correctly moves to dropdown when opened"
+      },
+      {
+        "name": "Focus returns to button when closed",
+        "passed": true,
+        "details": "Focus correctly returns to button when dropdown is closed"
+      },
+      {
+        "name": "Focus remains within dropdown during navigation",
+        "passed": true,
+        "details": "Focus properly trapped within dropdown"
+      },
+      {
+        "name": "Focus maintained during repositioning",
+        "passed": true,
+        "details": "Focus maintained during dropdown repositioning"
+      }
+    ],
+    "assistiveTechnology": [
+      {
+        "name": "Voice control compatibility",
+        "passed": true,
+        "details": "Elements have accessible names for voice control"
+      },
+      {
+        "name": "High contrast mode compatibility",
+        "passed": true,
+        "details": "Dropdown has sufficient visual indicators for high contrast mode"
+      },
+      {
+        "name": "Reduced motion preference support",
+        "passed": true,
+        "details": "Browser supports prefers-reduced-motion media query"
+      },
+      {
+        "name": "Screen magnification compatibility",
+        "passed": true,
+        "details": "Dropdown positioning accounts for viewport constraints"
+      }
+    ]
+  }
+}

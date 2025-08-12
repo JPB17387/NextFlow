@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance and Edge Case Testing - Theme Dropdown Layout Fix</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--theme-primary-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px var(--theme-shadow-medium);
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 1px solid var(--theme-border-light);
+            border-radius: 6px;
+            background: var(--theme-secondary-bg);
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, var(--theme-button-primary-start) 0%, var(--theme-button-primary-end) 100%);
+            color: var(--theme-header-text);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .test-button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--theme-button-primary-shadow);
+        }
+        
+        .test-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .test-button.danger {
+            background: linear-gradient(135deg, var(--theme-error) 0%, var(--theme-error-hover) 100%);
+        }
+        
+        .test-button.success {
+            background: linear-gradient(135deg, var(--theme-success) 0%, var(--theme-success-light) 100%);
+        }
+        
+        .results-display {
+            background: var(--theme-task-bg);
+            border: 1px solid var(--theme-border-light);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .result-item {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid var(--theme-border-light);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-pass {
+            color: var(--theme-success);
+        }
+        
+        .result-fail {
+            color: var(--theme-error);
+        }
+        
+        .result-warning {
+            color: var(--theme-warning);
+        }
+        
+        .result-info {
+            color: var(--theme-text-secondary);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .metric-card {
+            background: var(--theme-primary-bg);
+            border: 1px solid var(--theme-border-light);
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--theme-accent);
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--theme-text-muted);
+        }
+        
+        .large-task-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--theme-border-light);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .simulated-task {
+            background: var(--theme-task-bg);
+            border: 1px solid var(--theme-border-light);
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .viewport-simulator {
+            border: 2px solid var(--theme-border-medium);
+            border-radius: 6px;
+            margin: 1rem 0;
+            overflow: hidden;
+            resize: both;
+            min-width: 200px;
+            min-height: 150px;
+        }
+        
+        .viewport-content {
+            padding: 1rem;
+            background: var(--theme-secondary-bg);
+            height: 100%;
+            position: relative;
+        }
+        
+        .multiple-dropdowns {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        
+        .dropdown-simulator {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .sim-dropdown-btn {
+            background: var(--theme-accent);
+            color: var(--theme-header-text);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .sim-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--theme-primary-bg);
+            border: 1px solid var(--theme-border-medium);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px var(--theme-shadow-medium);
+            min-width: 120px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .sim-dropdown-menu.show {
+            display: block;
+        }
+        
+        .sim-dropdown-item {
+            padding: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .sim-dropdown-item:hover {
+            background: var(--theme-secondary-bg);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--theme-progress-bg);
+            border-radius: 2px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--theme-progress-fill-start) 0%, var(--theme-progress-fill-end) 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .no-js-fallback {
+            display: none;
+            background: var(--theme-warning-bg);
+            border: 1px solid var(--theme-warning-border);
+            color: var(--theme-warning-text);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Performance & Edge Case Testing</h1>
+        <div class="header-controls">
+            <div class="time-display">
+                <div id="clock">Loading...</div>
+                <div id="date">Loading...</div>
+            </div>
+            <div class="theme-selector">
+                <button class="theme-toggle-btn" id="themeToggle" aria-expanded="false" aria-haspopup="true">
+                    <span class="theme-icon">🎨</span>
+                    <span class="theme-label">Light Theme</span>
+                    <span class="theme-arrow">▼</span>
+                </button>
+                <ul class="theme-dropdown" id="themeDropdown" role="menu" aria-hidden="true">
+                    <!-- Theme options will be populated by JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="test-container">
+            <h2>Theme Dropdown Layout Fix - Performance & Edge Case Testing</h2>
+            <p>This test suite validates positioning performance with large task lists, multiple dropdowns, narrow viewports, and JavaScript failure scenarios.</p>
+            
+            <!-- Test 1: Large Task List Performance -->
+            <div class="test-section">
+                <h3>Test 1: Positioning Performance with Large Task Lists</h3>
+                <p>Tests dropdown positioning performance when the task list contains many items (Requirements 1.5, 4.4)</p>
+                
+                <div class="test-controls">
+                    <button class="test-button" id="generateLargeTaskList">Generate Large Task List (100 items)</button>
+                    <button class="test-button" id="testLargeListPositioning">Test Positioning Performance</button>
+                    <button class="test-button danger" id="clearLargeTaskList">Clear Task List</button>
+                </div>
+                
+                <div class="large-task-list" id="largeTaskListContainer">
+                    <p>Click "Generate Large Task List" to create test data</p>
+                </div>
+                
+                <div class="results-display" id="largeListResults"></div>
+            </div>
+            
+            <!-- Test 2: Multiple Dropdowns -->
+            <div class="test-section">
+                <h3>Test 2: Multiple Dropdowns Behavior</h3>
+                <p>Tests behavior when multiple dropdowns might be present (Requirements 3.4)</p>
+                
+                <div class="test-controls">
+                    <button class="test-button" id="createMultipleDropdowns">Create Multiple Dropdowns</button>
+                    <button class="test-button" id="testMultipleDropdownsPositioning">Test Positioning</button>
+                    <button class="test-button danger" id="clearMultipleDropdowns">Clear Dropdowns</button>
+                </div>
+                
+                <div class="multiple-dropdowns" id="multipleDropdownsContainer">
+                    <p>Click "Create Multiple Dropdowns" to generate test dropdowns</p>
+                </div>
+                
+                <div class="results-display" id="multipleDropdownsResults"></div>
+            </div>
+            
+            <!-- Test 3: Narrow Viewport Edge Cases -->
+            <div class="test-section">
+                <h3>Test 3: Very Narrow Viewport Edge Cases</h3>
+                <p>Tests positioning behavior in extremely narrow viewports (Requirements 1.5, 4.4)</p>
+                
+                <div class="test-controls">
+                    <button class="test-button" id="testNarrowViewports">Test Narrow Viewports</button>
+                    <button class="test-button" id="simulateViewportResize">Simulate Viewport Resize</button>
+                    <button class="test-button" id="testMobileViewports">Test Mobile Viewports</button>
+                </div>
+                
+                <div class="viewport-simulator" id="viewportSimulator" style="width: 320px; height: 200px;">
+                    <div class="viewport-content">
+                        <p>Resizable viewport simulator</p>
+                        <div class="theme-selector">
+                            <button class="sim-dropdown-btn" id="simThemeBtn">Theme ▼</button>
+                            <div class="sim-dropdown-menu" id="simThemeMenu">
+                                <div class="sim-dropdown-item">Light</div>
+                                <div class="sim-dropdown-item">Dark</div>
+                                <div class="sim-dropdown-item">Student</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-display" id="narrowViewportResults"></div>
+            </div>
+            
+            <!-- Test 4: JavaScript Failure Graceful Degradation -->
+            <div class="test-section">
+                <h3>Test 4: JavaScript Failure Graceful Degradation</h3>
+                <p>Tests graceful degradation when JavaScript fails (Requirements 1.5, 3.4)</p>
+                
+                <div class="test-controls">
+                    <button class="test-button danger" id="simulateJSFailure">Simulate JS Failure</button>
+                    <button class="test-button" id="testCSSOnlyPositioning">Test CSS-Only Positioning</button>
+                    <button class="test-button success" id="restoreJSFunctionality">Restore JS Functionality</button>
+                </div>
+                
+                <div class="no-js-fallback" id="noJsFallback">
+                    <strong>JavaScript Disabled:</strong> Theme dropdown positioning falls back to CSS-only implementation.
+                </div>
+                
+                <div class="results-display" id="jsFailureResults"></div>
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="test-section">
+                <h3>Overall Performance Metrics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="avgPositioningTime">0ms</div>
+                        <div class="metric-label">Avg Positioning Time</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="maxPositioningTime">0ms</div>
+                        <div class="metric-label">Max Positioning Time</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="cacheHitRate">0%</div>
+                        <div class="metric-label">Cache Hit Rate</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="memoryUsage">0MB</div>
+                        <div class="metric-label">Memory Usage</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="totalTests">0</div>
+                        <div class="metric-label">Tests Completed</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="passRate">0%</div>
+                        <div class="metric-label">Pass Rate</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Test Progress -->
+            <div class="progress-bar" id="testProgress" style="display: none;">
+                <div class="progress-fill" id="testProgressFill"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../theme-manager.js"></script>
+    <script src="../script.js"></script>
+    <script src="test-performance-edge-cases.js"></script>
+</body>
+</html>

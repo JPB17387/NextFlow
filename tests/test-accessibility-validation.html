@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Validation Tests - Theme Dropdown</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .test-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .test-results {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .test-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .keyboard-instructions {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .focus-indicator {
+            outline: 3px solid #007bff;
+            outline-offset: 2px;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Test layout variations */
+        .layout-desktop {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            min-height: 400px;
+        }
+        
+        .layout-mobile {
+            display: block;
+            max-width: 375px;
+        }
+        
+        .mock-task-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 200px;
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #343a40;
+            color: white;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Accessibility Validation Tests</h1>
+        <p>This page tests the accessibility compliance of the theme dropdown positioning system.</p>
+        
+        <!-- ARIA Live Region for announcements -->
+        <div id="accessibility-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+        
+        <div class="keyboard-instructions">
+            <h3>Manual Testing Instructions:</h3>
+            <ul>
+                <li><strong>Tab Navigation:</strong> Use Tab/Shift+Tab to navigate through elements</li>
+                <li><strong>Enter/Space:</strong> Activate buttons and dropdown</li>
+                <li><strong>Arrow Keys:</strong> Navigate within dropdown options</li>
+                <li><strong>Escape:</strong> Close dropdown and return focus</li>
+                <li><strong>Screen Reader:</strong> Enable screen reader to test announcements</li>
+            </ul>
+        </div>
+
+        <!-- Test Section 1: Keyboard Navigation -->
+        <div class="test-section">
+            <h2>Test 1: Keyboard Navigation with Positioning System</h2>
+            <div id="test1-results" class="test-results test-info">
+                Running keyboard navigation tests...
+            </div>
+            
+            <div class="test-header">
+                <h3>Test Layout - Desktop Grid</h3>
+                <div class="theme-selector">
+                    <button id="test-theme-btn-1" class="theme-toggle-btn" aria-haspopup="true" aria-expanded="false">
+                        🎨 Theme
+                    </button>
+                    <div id="test-dropdown-1" class="theme-dropdown" style="display: none;">
+                        <button class="theme-option" data-theme="light">Light</button>
+                        <button class="theme-option" data-theme="dark">Dark</button>
+                        <button class="theme-option" data-theme="blue">Blue</button>
+                        <button class="theme-option" data-theme="green">Green</button>
+                        <button class="theme-option" data-theme="purple">Purple</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layout-desktop">
+                <div>
+                    <h4>Main Content Area</h4>
+                    <button id="before-theme">Focus Before Theme</button>
+                    <button id="after-theme">Focus After Theme</button>
+                </div>
+                <div class="mock-task-list">
+                    <h4>Your Tasks</h4>
+                    <p>This simulates the task list that could be overlapped by the dropdown.</p>
+                    <button>Task Button 1</button>
+                    <button>Task Button 2</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Section 2: Screen Reader Announcements -->
+        <div class="test-section">
+            <h2>Test 2: Screen Reader Announcements</h2>
+            <div id="test2-results" class="test-results test-info">
+                Testing screen reader announcements...
+            </div>
+            
+            <div class="test-header">
+                <h3>Test Layout - Mobile</h3>
+                <div class="theme-selector">
+                    <button id="test-theme-btn-2" class="theme-toggle-btn" aria-haspopup="true" aria-expanded="false">
+                        <span class="sr-only">Select theme, current theme is </span>
+                        🎨 Theme
+                    </button>
+                    <div id="test-dropdown-2" class="theme-dropdown" role="menu" aria-labelledby="test-theme-btn-2" style="display: none;">
+                        <button class="theme-option" role="menuitem" data-theme="light">Light Theme</button>
+                        <button class="theme-option" role="menuitem" data-theme="dark">Dark Theme</button>
+                        <button class="theme-option" role="menuitem" data-theme="blue">Blue Theme</button>
+                        <button class="theme-option" role="menuitem" data-theme="green">Green Theme</button>
+                        <button class="theme-option" role="menuitem" data-theme="purple">Purple Theme</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="layout-mobile">
+                <p>Mobile layout test for screen reader compatibility.</p>
+                <button>Mobile Button 1</button>
+                <button>Mobile Button 2</button>
+            </div>
+        </div>
+
+        <!-- Test Section 3: Focus Management -->
+        <div class="test-section">
+            <h2>Test 3: Focus Management During Positioning Changes</h2>
+            <div id="test3-results" class="test-results test-info">
+                Testing focus management...
+            </div>
+            
+            <div class="test-header">
+                <h3>Dynamic Positioning Test</h3>
+                <div class="theme-selector">
+                    <button id="test-theme-btn-3" class="theme-toggle-btn" aria-haspopup="true" aria-expanded="false">
+                        🎨 Dynamic Theme
+                    </button>
+                    <div id="test-dropdown-3" class="theme-dropdown" style="display: none;">
+                        <button class="theme-option" data-theme="light">Light</button>
+                        <button class="theme-option" data-theme="dark">Dark</button>
+                        <button class="theme-option" data-theme="blue">Blue</button>
+                        <button class="theme-option" data-theme="green">Green</button>
+                        <button class="theme-option" data-theme="purple">Purple</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <button id="trigger-reposition">Trigger Repositioning</button>
+                <button id="resize-simulation">Simulate Resize</button>
+                <p>Use these buttons to test focus management during dynamic positioning changes.</p>
+            </div>
+        </div>
+
+        <!-- Test Section 4: Assistive Technology Compatibility -->
+        <div class="test-section">
+            <h2>Test 4: Assistive Technology Compatibility</h2>
+            <div id="test4-results" class="test-results test-info">
+                Testing assistive technology compatibility...
+            </div>
+            
+            <div class="test-header">
+                <h3>Multi-Position Test</h3>
+                <div class="theme-selector">
+                    <button id="test-theme-btn-4" class="theme-toggle-btn" aria-haspopup="true" aria-expanded="false" aria-describedby="theme-help">
+                        🎨 AT Test Theme
+                    </button>
+                    <div id="theme-help" class="sr-only">
+                        Theme selector dropdown. Use arrow keys to navigate options, Enter to select, Escape to close.
+                    </div>
+                    <div id="test-dropdown-4" class="theme-dropdown" role="menu" aria-labelledby="test-theme-btn-4" style="display: none;">
+                        <button class="theme-option" role="menuitem" data-theme="light" aria-describedby="light-desc">
+                            Light
+                            <span id="light-desc" class="sr-only">Light theme with white background</span>
+                        </button>
+                        <button class="theme-option" role="menuitem" data-theme="dark" aria-describedby="dark-desc">
+                            Dark
+                            <span id="dark-desc" class="sr-only">Dark theme with black background</span>
+                        </button>
+                        <button class="theme-option" role="menuitem" data-theme="blue" aria-describedby="blue-desc">
+                            Blue
+                            <span id="blue-desc" class="sr-only">Blue theme with blue accent colors</span>
+                        </button>
+                        <button class="theme-option" role="menuitem" data-theme="green" aria-describedby="green-desc">
+                            Green
+                            <span id="green-desc" class="sr-only">Green theme with green accent colors</span>
+                        </button>
+                        <button class="theme-option" role="menuitem" data-theme="purple" aria-describedby="purple-desc">
+                            Purple
+                            <span id="purple-desc" class="sr-only">Purple theme with purple accent colors</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <button id="position-left">Test Left Position</button>
+                <button id="position-center">Test Center Position</button>
+                <button id="position-right">Test Right Position</button>
+                <p>Test dropdown positioning with assistive technologies.</p>
+            </div>
+        </div>
+
+        <!-- Test Results Summary -->
+        <div class="test-section">
+            <h2>Test Results Summary</h2>
+            <div id="summary-results" class="test-results test-info">
+                Initializing tests...
+            </div>
+        </div>
+    </div>
+
+    <script src="../theme-manager.js"></script>
+    <script src="test-accessibility-validation.js"></script>
+</body>
+</html>

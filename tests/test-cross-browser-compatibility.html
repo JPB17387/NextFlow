@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cross-Browser Compatibility Tests - Theme Dropdown</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .test-container {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .browser-info {
+            background-color: #e7f3ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .positioning-test-area {
+            position: relative;
+            height: 200px;
+            border: 2px dashed #ccc;
+            margin: 10px 0;
+        }
+        .mock-dropdown {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1050;
+            min-width: 200px;
+        }
+        .mock-obstacle {
+            position: absolute;
+            background: #f0f0f0;
+            border: 1px solid #999;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Cross-Browser Compatibility Tests</h1>
+        
+        <div class="browser-info" id="browserInfo">
+            <h3>Browser Information</h3>
+            <div id="browserDetails"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>CSS Positioning Tests</h2>
+            <div id="cssPositioningResults"></div>
+            
+            <div class="positioning-test-area" id="cssTestArea">
+                <div class="mock-dropdown" id="testDropdown" style="top: 20px; right: 20px;">
+                    Test Dropdown
+                </div>
+                <div class="mock-obstacle" id="testObstacle" style="top: 50px; right: 50px; width: 150px; height: 100px;">
+                    Obstacle Element
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>JavaScript Collision Detection Tests</h2>
+            <div id="jsCollisionResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Fallback Positioning Tests</h2>
+            <div id="fallbackResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Browser Engine Specific Tests</h2>
+            <div id="engineResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Legacy Browser Support Tests</h2>
+            <div id="legacyResults"></div>
+        </div>
+
+        <button onclick="runAllTests()" style="padding: 10px 20px; font-size: 16px; margin: 20px 0;">
+            Run All Cross-Browser Tests
+        </button>
+    </div>
+
+    <script src="../theme-manager.js"></script>
+    <script src="test-cross-browser-compatibility.js"></script>
+</body>
+</html>

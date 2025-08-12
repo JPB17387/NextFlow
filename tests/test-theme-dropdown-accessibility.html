@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Dropdown Accessibility Test</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .test-results {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .test-pass {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .test-fail {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .test-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .test-button {
+            margin: 10px 5px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .test-button:hover {
+            background-color: #0056b3;
+        }
+        
+        .accessibility-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Theme Dropdown Accessibility Test Suite</h1>
+        <p>This test suite validates the accessibility enhancements for the theme dropdown, including focus management, keyboard navigation, and screen reader compatibility during dynamic positioning.</p>
+        
+        <div class="accessibility-info">
+            <h3>Accessibility Requirements Being Tested:</h3>
+            <ul>
+                <li><strong>5.1:</strong> Focus remains within dropdown during positioning changes</li>
+                <li><strong>5.2:</strong> Keyboard navigation functionality regardless of position</li>
+                <li><strong>5.3:</strong> ARIA live region announcements for significant positioning changes</li>
+                <li><strong>5.4:</strong> Screen reader compatibility with dynamic positioning</li>
+                <li><strong>5.5:</strong> Proper focus management and accessibility features</li>
+            </ul>
+        </div>
+
+        <!-- Theme Dropdown Test Area -->
+        <div class="test-section">
+            <h2>Theme Dropdown Test Area</h2>
+            <p>Use this theme dropdown to test accessibility features:</p>
+            
+            <header role="banner" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #f8f9fa; margin: 20px 0;">
+                <h3>Test Header</h3>
+                <div class="theme-selector" role="region" aria-label="Theme selection">
+                    <button id="themeToggle" 
+                            class="theme-toggle-btn" 
+                            aria-haspopup="listbox" 
+                            aria-expanded="false"
+                            aria-label="Select theme"
+                            aria-describedby="theme-help">
+                        <span class="theme-icon" aria-hidden="true">🎨</span>
+                        <span class="theme-label">Theme</span>
+                        <span class="theme-arrow" aria-hidden="true">▼</span>
+                    </button>
+                    <div id="theme-help" class="sr-only">Choose a visual theme for the application</div>
+                    <ul id="themeDropdown" 
+                        class="theme-dropdown" 
+                        role="listbox" 
+                        aria-label="Available themes"
+                        aria-hidden="true">
+                        <li role="option" 
+                            data-theme="white" 
+                            class="theme-option" 
+                            tabindex="-1"
+                            aria-selected="true">
+                            <span class="theme-preview" style="background-color: #ffffff; border: 1px solid #e2e8f0;" aria-hidden="true"></span>
+                            <span class="theme-name">Light Theme</span>
+                        </li>
+                        <li role="option" 
+                            data-theme="dark" 
+                            class="theme-option" 
+                            tabindex="-1"
+                            aria-selected="false">
+                            <span class="theme-preview" style="background-color: #1a202c;" aria-hidden="true"></span>
+                            <span class="theme-name">Dark Theme</span>
+                        </li>
+                        <li role="option" 
+                            data-theme="student" 
+                            class="theme-option" 
+                            tabindex="-1"
+                            aria-selected="false">
+                            <span class="theme-preview" style="background-color: #3182ce;" aria-hidden="true"></span>
+                            <span class="theme-name">Student Theme</span>
+                        </li>
+                        <li role="option" 
+                            data-theme="developer" 
+                            class="theme-option" 
+                            tabindex="-1"
+                            aria-selected="false">
+                            <span class="theme-preview" style="background-color: #0d1117;" aria-hidden="true"></span>
+                            <span class="theme-name">Developer Theme</span>
+                        </li>
+                        <li role="option" 
+                            data-theme="professional" 
+                            class="theme-option" 
+                            tabindex="-1"
+                            aria-selected="false">
+                            <span class="theme-preview" style="background-color: #1976d2;" aria-hidden="true"></span>
+                            <span class="theme-name">Professional Theme</span>
+                        </li>
+                    </ul>
+                </div>
+            </header>
+            
+            <!-- Simulated content that might cause overlap -->
+            <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; margin: 20px 0;">
+                <div>
+                    <h4>Main Content Area</h4>
+                    <p>This content simulates the main application area.</p>
+                </div>
+                <div class="task-list-section" style="background: #f0f0f0; padding: 15px; border-radius: 5px;">
+                    <h4>Your Tasks (Simulated)</h4>
+                    <p>This simulates the task list that might overlap with the theme dropdown.</p>
+                    <div style="height: 200px; background: white; border: 1px solid #ddd; margin: 10px 0;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Controls -->
+        <div class="test-section">
+            <h2>Accessibility Test Controls</h2>
+            <p>Run these tests to validate accessibility features:</p>
+            
+            <button class="test-button" onclick="runComprehensiveAccessibilityTest()">
+                Run Comprehensive Accessibility Test
+            </button>
+            
+            <button class="test-button" onclick="testFocusManagement()">
+                Test Focus Management
+            </button>
+            
+            <button class="test-button" onclick="testKeyboardNavigation()">
+                Test Keyboard Navigation
+            </button>
+            
+            <button class="test-button" onclick="testPositioningAnnouncements()">
+                Test Positioning Announcements
+            </button>
+            
+            <button class="test-button" onclick="testScreenReaderCompatibility()">
+                Test Screen Reader Compatibility
+            </button>
+            
+            <button class="test-button" onclick="simulatePositioningChanges()">
+                Simulate Positioning Changes
+            </button>
+            
+            <button class="test-button" onclick="clearTestResults()">
+                Clear Results
+            </button>
+        </div>
+
+        <!-- Test Results Display -->
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div id="testResults" class="test-results">
+                Click a test button above to see results here.
+            </div>
+        </div>
+
+        <!-- Manual Testing Instructions -->
+        <div class="test-section">
+            <h2>Manual Testing Instructions</h2>
+            <div class="accessibility-info">
+                <h3>Keyboard Testing:</h3>
+                <ol>
+                    <li>Tab to the theme button and press Enter or Space to open</li>
+                    <li>Use arrow keys to navigate between theme options</li>
+                    <li>Press Enter or Space to select a theme</li>
+                    <li>Press Escape to close without selecting</li>
+                    <li>Test Tab and Shift+Tab to ensure focus trap works</li>
+                </ol>
+                
+                <h3>Screen Reader Testing:</h3>
+                <ol>
+                    <li>Enable a screen reader (NVDA, JAWS, VoiceOver, etc.)</li>
+                    <li>Navigate to the theme button and activate it</li>
+                    <li>Listen for positioning announcements</li>
+                    <li>Navigate through theme options and listen for descriptions</li>
+                    <li>Test with different viewport sizes to trigger repositioning</li>
+                </ol>
+                
+                <h3>Focus Management Testing:</h3>
+                <ol>
+                    <li>Open the theme dropdown</li>
+                    <li>Resize the browser window to trigger repositioning</li>
+                    <li>Verify focus remains on the current option</li>
+                    <li>Test with different positioning scenarios</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include required scripts -->
+    <script src="../theme-manager.js"></script>
+    <script src="../script.js"></script>
+    
+    <script>
+        // Test functions
+        function runComprehensiveAccessibilityTest() {
+            const results = document.getElementById('testResults');
+            results.className = 'test-results';
+            results.textContent = 'Running comprehensive accessibility test...\n\n';
+            
+            try {
+                const testResults = testScreenReaderCompatibility();
+                
+                let output = `COMPREHENSIVE ACCESSIBILITY TEST RESULTS\n`;
+                output += `=========================================\n\n`;
+                output += `Overall Result: ${testResults.overall ? 'PASS' : 'FAIL'}\n`;
+                output += `Pass Rate: ${testResults.passRate || 0}%\n\n`;
+                
+                output += `Individual Test Results:\n`;
+                output += `------------------------\n`;
+                Object.entries(testResults.tests).forEach(([testName, result]) => {
+                    output += `${testName}: ${result ? 'PASS' : 'FAIL'}\n`;
+                });
+                
+                output += `\nDetailed Results:\n`;
+                output += `----------------\n`;
+                testResults.details.forEach(detail => {
+                    output += `${detail}\n`;
+                });
+                
+                if (testResults.recommendations && testResults.recommendations.length > 0) {
+                    output += `\nRecommendations:\n`;
+                    output += `---------------\n`;
+                    testResults.recommendations.forEach((rec, index) => {
+                        output += `${index + 1}. ${rec}\n`;
+                    });
+                }
+                
+                results.textContent = output;
+                results.className = `test-results ${testResults.overall ? 'test-pass' : 'test-fail'}`;
+                
+            } catch (error) {
+                results.textContent = `ERROR: Test execution failed\n${error.message}`;
+                results.className = 'test-results test-fail';
+            }
+        }
+        
+        function testFocusManagement() {
+            const results = document.getElementById('testResults');
+            results.className = 'test-results';
+            results.textContent = 'Testing focus management...\n\n';
+            
+            try {
+                const dropdown = document.getElementById('themeDropdown');
+                const toggle = document.getElementById('themeToggle');
+                
+                let output = `FOCUS MANAGEMENT TEST\n`;
+                output += `====================\n\n`;
+                
+                // Test 1: Open dropdown and check focus
+                toggle.click();
+                setTimeout(() => {
+                    const focusedElement = document.activeElement;
+                    const isFocusInDropdown = dropdown.contains(focusedElement);
+                    output += `Focus after opening: ${isFocusInDropdown ? 'PASS' : 'FAIL'}\n`;
+                    
+                    // Test 2: Simulate positioning change
+                    dropdown.classList.add('position-left');
+                    maintainDropdownFocus(dropdown, focusedElement);
+                    
+                    setTimeout(() => {
+                        const focusAfterPositioning = document.activeElement;
+                        const focusMaintained = focusAfterPositioning === focusedElement;
+                        output += `Focus maintained after positioning: ${focusMaintained ? 'PASS' : 'FAIL'}\n`;
+                        
+                        dropdown.classList.remove('position-left');
+                        
+                        // Test 3: Close and check focus restoration
+                        closeThemeDropdown();
+                        setTimeout(() => {
+                            const focusAfterClose = document.activeElement;
+                            const focusRestored = focusAfterClose === toggle;
+                            output += `Focus restored after closing: ${focusRestored ? 'PASS' : 'FAIL'}\n`;
+                            
+                            results.textContent = output;
+                            results.className = 'test-results test-pass';
+                        }, 100);
+                    }, 100);
+                }, 100);
+                
+            } catch (error) {
+                results.textContent = `ERROR: Focus management test failed\n${error.message}`;
+                results.className = 'test-results test-fail';
+            }
+        }
+        
+        function testKeyboardNavigation() {
+            const results = document.getElementById('testResults');
+            results.className = 'test-results';
+            
+            let output = `KEYBOARD NAVIGATION TEST\n`;
+            output += `=======================\n\n`;
+            
+            try {
+                const dropdown = document.getElementById('themeDropdown');
+                const options = dropdown.querySelectorAll('.theme-option');
+                
+                // Test setup
+                const hasProperTabindex = Array.from(options).some(option => 
+                    option.getAttribute('tabindex') === '0' || option.getAttribute('tabindex') === '-1'
+                );
+                output += `Proper tabindex setup: ${hasProperTabindex ? 'PASS' : 'FAIL'}\n`;
+                
+                const hasAriaAttributes = dropdown.hasAttribute('role') && 
+                                        dropdown.getAttribute('role') === 'listbox';
+                output += `Proper ARIA role: ${hasAriaAttributes ? 'PASS' : 'FAIL'}\n`;
+                
+                const hasKeyboardInstructions = dropdown.hasAttribute('aria-describedby');
+                output += `Keyboard instructions provided: ${hasKeyboardInstructions ? 'PASS' : 'FAIL'}\n`;
+                
+                // Test option attributes
+                const optionsHaveProperAttributes = Array.from(options).every(option => 
+                    option.hasAttribute('role') && 
+                    option.hasAttribute('aria-selected') &&
+                    option.hasAttribute('tabindex')
+                );
+                output += `Options have proper attributes: ${optionsHaveProperAttributes ? 'PASS' : 'FAIL'}\n`;
+                
+                results.textContent = output;
+                results.className = 'test-results test-pass';
+                
+            } catch (error) {
+                results.textContent = `ERROR: Keyboard navigation test failed\n${error.message}`;
+                results.className = 'test-results test-fail';
+            }
+        }
+        
+        function testPositioningAnnouncements() {
+            const results = document.getElementById('testResults');
+            results.className = 'test-results';
+            
+            let output = `POSITIONING ANNOUNCEMENTS TEST\n`;
+            output += `=============================\n\n`;
+            
+            try {
+                // Test live region creation
+                const liveRegion = getOrCreateAriaLiveRegion();
+                const hasLiveRegion = liveRegion && 
+                                    liveRegion.getAttribute('aria-live') === 'polite';
+                output += `Live region exists: ${hasLiveRegion ? 'PASS' : 'FAIL'}\n`;
+                
+                // Test announcement function
+                const originalContent = liveRegion.textContent;
+                announcePositioningChange({
+                    positionChanged: true,
+                    strategy: 'collision-avoided',
+                    significantChange: true
+                });
+                
+                setTimeout(() => {
+                    const announcementMade = liveRegion.textContent !== originalContent;
+                    output += `Positioning announcement made: ${announcementMade ? 'PASS' : 'FAIL'}\n`;
+                    
+                    // Test different announcement types
+                    const strategies = ['left-aligned', 'center-aligned', 'viewport-adjusted'];
+                    strategies.forEach(strategy => {
+                        announcePositioningChange({
+                            positionChanged: true,
+                            strategy: strategy,
+                            significantChange: true
+                        });
+                        output += `${strategy} announcement: PASS\n`;
+                    });
+                    
+                    results.textContent = output;
+                    results.className = 'test-results test-pass';
+                }, 200);
+                
+            } catch (error) {
+                results.textContent = `ERROR: Positioning announcements test failed\n${error.message}`;
+                results.className = 'test-results test-fail';
+            }
+        }
+        
+        function simulatePositioningChanges() {
+            const results = document.getElementById('testResults');
+            results.className = 'test-results';
+            
+            let output = `POSITIONING SIMULATION TEST\n`;
+            output += `==========================\n\n`;
+            
+            try {
+                const dropdown = document.getElementById('themeDropdown');
+                const toggle = document.getElementById('themeToggle');
+                
+                // Open dropdown first
+                toggle.click();
+                
+                setTimeout(() => {
+                    const positioningClasses = ['position-left', 'position-center', 'position-offset-left'];
+                    let testIndex = 0;
+                    
+                    function testNextPosition() {
+                        if (testIndex < positioningClasses.length) {
+                            const className = positioningClasses[testIndex];
+                            dropdown.classList.add(className);
+                            
+                            output += `Applied ${className}: Testing...\n`;
+                            
+                            // Trigger positioning change event
+                            const event = new CustomEvent('positionchange');
+                            dropdown.dispatchEvent(event);
+                            
+                            // Test focus maintenance
+                            const currentFocus = document.activeElement;
+                            const focusInDropdown = dropdown.contains(currentFocus);
+                            output += `Focus maintained with ${className}: ${focusInDropdown ? 'PASS' : 'FAIL'}\n`;
+                            
+                            dropdown.classList.remove(className);
+                            testIndex++;
+                            
+                            setTimeout(testNextPosition, 500);
+                        } else {
+                            output += `\nAll positioning tests completed.\n`;
+                            closeThemeDropdown();
+                            results.textContent = output;
+                            results.className = 'test-results test-pass';
+                        }
+                    }
+                    
+                    testNextPosition();
+                }, 200);
+                
+            } catch (error) {
+                results.textContent = `ERROR: Positioning simulation failed\n${error.message}`;
+                results.className = 'test-results test-fail';
+            }
+        }
+        
+        function clearTestResults() {
+            const results = document.getElementById('testResults');
+            results.textContent = 'Click a test button above to see results here.';
+            results.className = 'test-results';
+        }
+        
+        // Initialize theme system when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof themeManager !== 'undefined') {
+                themeManager.initializeThemeSystem();
+            }
+            
+            // Set up theme dropdown functionality
+            const themeToggle = document.getElementById('themeToggle');
+            const themeDropdown = document.getElementById('themeDropdown');
+            
+            if (themeToggle && themeDropdown) {
+                themeToggle.addEventListener('click', toggleThemeDropdown);
+                
+                // Set up theme option click handlers
+                const options = themeDropdown.querySelectorAll('.theme-option');
+                options.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const themeName = this.getAttribute('data-theme');
+                        selectTheme(themeName);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -556,13 +556,35 @@ header h1 {
     .theme-toggle-btn {
         padding: 0.5rem;
         min-width: 44px;
+        min-height: 44px; /* Touch-friendly minimum size */
         justify-content: center;
     }
     
     .theme-dropdown {
-        right: 0;
+        right: 16px; /* Adequate spacing from viewport edge */
         left: auto;
         min-width: 160px;
+        max-width: calc(100vw - 32px); /* Responsive max-width constraint */
+        margin-right: 0;
+    }
+    
+    /* Ensure dropdown doesn't extend beyond left edge on small screens */
+    .theme-dropdown.position-left {
+        right: auto;
+        left: 16px;
+        max-width: calc(100vw - 32px);
+    }
+    
+    /* Center positioning for very narrow screens */
+    .theme-dropdown.position-center {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+        max-width: calc(100vw - 32px);
+    }
+    
+    .theme-dropdown.position-center[aria-hidden="false"] {
+        transform: translateX(-50%) translateY(0);
     }
 }
 
@@ -618,7 +640,8 @@ header h1 {
     border-radius: 8px;
     box-shadow: 0 4px 12px var(--theme-shadow-medium);
     min-width: 180px;
-    z-index: 1000;
+    max-width: calc(100vw - 2rem); /* Prevent viewport overflow */
+    z-index: 1050; /* Higher z-index to ensure it appears above all other content */
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -632,6 +655,75 @@ header h1 {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+}
+
+/* Collision-aware positioning classes for alternative dropdown positioning */
+.theme-dropdown.position-left {
+    right: auto;
+    left: 0;
+}
+
+.theme-dropdown.position-center {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+}
+
+.theme-dropdown.position-center[aria-hidden="false"] {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Desktop-specific positioning adjustments */
+@media (min-width: 1024px) {
+    .theme-dropdown {
+        /* Enhanced positioning for desktop grid layout */
+        right: 0;
+        left: auto;
+        min-width: 200px;
+        max-width: 320px;
+    }
+    
+    /* Alternative positioning when overlap detected */
+    .theme-dropdown.position-left {
+        right: auto;
+        left: 0;
+        transform: translateY(-10px);
+    }
+    
+    .theme-dropdown.position-left[aria-hidden="false"] {
+        transform: translateY(0);
+    }
+    
+    .theme-dropdown.position-center {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    
+    .theme-dropdown.position-center[aria-hidden="false"] {
+        transform: translateX(-50%) translateY(0);
+    }
+    
+    /* Transform-based centering for collision avoidance */
+    .theme-dropdown.position-offset-left {
+        right: auto;
+        left: -50%;
+        transform: translateY(-10px);
+    }
+    
+    .theme-dropdown.position-offset-left[aria-hidden="false"] {
+        transform: translateY(0);
+    }
+    
+    .theme-dropdown.position-offset-right {
+        right: -25%;
+        left: auto;
+        transform: translateY(-10px);
+    }
+    
+    .theme-dropdown.position-offset-right[aria-hidden="false"] {
+        transform: translateY(0);
+    }
 }
 
 .theme-option {
@@ -1045,6 +1137,33 @@ footer p {
     #suggestionBtn {
         width: auto;
         align-self: flex-start;
+    }
+}
+
+/* Tablet-only specific positioning (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .theme-dropdown {
+        right: 24px; /* Adequate spacing from viewport edges on tablets */
+        left: auto;
+        min-width: 180px;
+        max-width: 300px; /* Responsive max-width constraint */
+    }
+    
+    .theme-dropdown.position-left {
+        right: auto;
+        left: 24px;
+        max-width: calc(100vw - 48px);
+    }
+    
+    .theme-dropdown.position-center {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+        max-width: calc(100vw - 48px);
+    }
+    
+    .theme-dropdown.position-center[aria-hidden="false"] {
+        transform: translateX(-50%) translateY(0);
     }
 }
 

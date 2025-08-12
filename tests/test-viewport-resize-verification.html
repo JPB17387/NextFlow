@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viewport Resize Verification Test</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .test-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .resize-instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header role="banner">
+        <h1>NextFlow Task Dashboard</h1>
+        <div class="header-controls">
+            <div class="time-display" role="region" aria-label="Current time and date">
+                <div id="clock" aria-live="polite" aria-label="Current time"></div>
+                <div id="date" aria-live="polite" aria-label="Current date"></div>
+            </div>
+            <div class="theme-selector" role="region" aria-label="Theme selection">
+                <button id="themeToggle" 
+                        class="theme-toggle-btn" 
+                        aria-haspopup="listbox" 
+                        aria-expanded="false"
+                        aria-label="Select theme">
+                    <span class="theme-icon" aria-hidden="true">🎨</span>
+                    <span class="theme-label">Theme</span>
+                    <span class="theme-arrow" aria-hidden="true">▼</span>
+                </button>
+                <ul id="themeDropdown" 
+                    class="theme-dropdown" 
+                    role="listbox" 
+                    aria-label="Available themes"
+                    aria-hidden="true">
+                    <li role="option" data-theme="white" class="theme-option" tabindex="-1" aria-selected="true">
+                        <span class="theme-preview" style="background-color: #ffffff; border: 1px solid #e2e8f0;" aria-hidden="true"></span>
+                        <span class="theme-name">Light Theme</span>
+                    </li>
+                    <li role="option" data-theme="dark" class="theme-option" tabindex="-1" aria-selected="false">
+                        <span class="theme-preview" style="background-color: #1a202c;" aria-hidden="true"></span>
+                        <span class="theme-name">Dark Theme</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="test-container">
+        <div class="test-info">
+            <h2>Viewport Resize Handling Verification</h2>
+            <p>This test verifies that the <code>handleViewportResize()</code> function is working correctly with debouncing and mobile orientation support.</p>
+        </div>
+
+        <div class="resize-instructions">
+            <h3>Test Instructions:</h3>
+            <ol>
+                <li>Open the theme dropdown by clicking the "Theme" button above</li>
+                <li>Resize your browser window (drag the edges)</li>
+                <li>On mobile: rotate your device to test orientation changes</li>
+                <li>Watch the test log below for resize events and positioning updates</li>
+            </ol>
+        </div>
+
+        <div>
+            <h3>Test Results:</h3>
+            <div>
+                <strong>Current Viewport:</strong> 
+                <span id="currentViewport">Loading...</span>
+            </div>
+            <div>
+                <strong>Orientation:</strong> 
+                <span id="currentOrientation">Loading...</span>
+            </div>
+            <div>
+                <strong>Device Type:</strong> 
+                <span id="deviceType">Loading...</span>
+            </div>
+            <div>
+                <strong>Resize Events:</strong> 
+                <span id="resizeCount">0</span>
+            </div>
+            <div>
+                <strong>Positioning Updates:</strong> 
+                <span id="positioningCount">0</span>
+            </div>
+            
+            <div class="test-log" id="testLog">
+                Test log will appear here...
+            </div>
+        </div>
+    </main>
+
+    <script src="../theme-manager.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        // Test verification script
+        let resizeEventCount = 0;
+        let positioningUpdateCount = 0;
+        const testLog = document.getElementById('testLog');
+
+        function logMessage(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            testLog.innerHTML += logEntry + '\n';
+            testLog.scrollTop = testLog.scrollHeight;
+        }
+
+        function updateViewportInfo() {
+            document.getElementById('currentViewport').textContent = 
+                `${window.innerWidth}x${window.innerHeight}`;
+            
+            document.getElementById('currentOrientation').textContent = 
+                window.orientation !== undefined ? `${window.orientation}°` : 'N/A';
+            
+            const width = window.innerWidth;
+            const deviceType = width <= 768 ? 'Mobile' : width <= 1024 ? 'Tablet' : 'Desktop';
+            document.getElementById('deviceType').textContent = deviceType;
+        }
+
+        // Override console.log to capture positioning updates
+        const originalConsoleLog = console.log;
+        console.log = function(...args) {
+            const message = args.join(' ');
+            if (message.includes('Dropdown positioning updated')) {
+                positioningUpdateCount++;
+                document.getElementById('positioningCount').textContent = positioningUpdateCount;
+                logMessage('✅ Positioning updated successfully');
+            } else if (message.includes('viewport resize')) {
+                logMessage('📏 Viewport resize detected');
+            } else if (message.includes('Orientation change')) {
+                logMessage('📱 Orientation change detected');
+            }
+            originalConsoleLog.apply(console, args);
+        };
+
+        // Track resize events
+        let originalHandleViewportResize;
+        if (typeof handleViewportResize === 'function') {
+            originalHandleViewportResize = handleViewportResize;
+            window.handleViewportResize = function() {
+                resizeEventCount++;
+                document.getElementById('resizeCount').textContent = resizeEventCount;
+                logMessage('🔄 Resize event triggered (debounced)');
+                return originalHandleViewportResize.apply(this, arguments);
+            };
+        }
+
+        // Initialize test
+        document.addEventListener('DOMContentLoaded', function() {
+            updateViewportInfo();
+            logMessage('🚀 Viewport resize test initialized');
+            logMessage('📋 Open theme dropdown and resize window to test');
+            
+            // Update viewport info on resize
+            window.addEventListener('resize', function() {
+                setTimeout(updateViewportInfo, 100);
+            });
+        });
+
+        // Test theme dropdown functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('#themeToggle')) {
+                const dropdown = document.getElementById('themeDropdown');
+                const isOpen = dropdown.getAttribute('aria-hidden') === 'false';
+                logMessage(isOpen ? '❌ Theme dropdown closed' : '✅ Theme dropdown opened');
+            }
+        });
+    </script>
+</body>
+</html>
